@@ -26,6 +26,7 @@ int getNumber(std::string s);
 //==============================================================================
 int main (int argc, char* argv[])
 {
+    // convert from char* array to std::string array
     std::string arg[10];
     if (argc > 10)
     {
@@ -47,6 +48,11 @@ int main (int argc, char* argv[])
 
     ////// (2) mider list ////////
     if ((arg[1] == "list") && (arg[2] == ""))
+    {
+        listDevices();
+        return 0;
+    }
+    else if ((arg[1] == "help") && (arg[2] == ""))
     {
         listDevices();
         return 0;
