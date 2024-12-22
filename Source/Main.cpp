@@ -10,6 +10,7 @@
 #include <regex>
 #include <iostream>
 #include <algorithm>
+#include <sstream>
 
 void usage(void);
 void listDevices(void);
@@ -66,15 +67,35 @@ int main (int argc, char* argv[])
 
     if (cmd[0] == "noteon")
     {
-        sendMessage(device, ch, 0x90, byte1, byte2);
+        sendMessage(device, ch, 0x90 + ch, byte1, byte2);
         std::cout << "  NoteOn";
         std::cout << " " << byte1 << " " << byte2;
     }
     else if (cmd[0] == "noteoff")
     {
-        sendMessage(device, ch, 0x80, byte1, byte2);
+        sendMessage(device, ch, 0x80 + ch, byte1, byte2);
         std::cout << "  NoteOff";
         std::cout << " " << byte1 << " " << byte2;
+    }
+    else if (cmd[0] == "allsoundoff")
+    {
+        // TODO: CC‚Æ‚µ‚Ä‚Ì‘‚«•ûŒŸ“¢
+        // check argv[4]‚ªÈ—ª‚Ü‚½‚Í120‚Å‚ ‚é‚±‚Æ
+        // check argv[5]‚ªÈ—ª‚Ü‚½‚Í0‚Å‚ ‚é‚±‚Æ
+
+        sendMessage(device, ch, 0xB0 + ch, 120, byte2);
+        std::cout << "  AllSoundOff";
+        std::cout << " " << 120 << " " << byte2;
+    }
+    else if (cmd[0] == "allnotesoff")
+    {
+        // TODO: CC‚Æ‚µ‚Ä‚Ì‘‚«•ûŒŸ“¢
+        // check argv[4]‚ªÈ—ª‚Ü‚½‚Í123‚Å‚ ‚é‚±‚Æ
+        // check argv[5]‚ªÈ—ª‚Ü‚½‚Í0‚Å‚ ‚é‚±‚Æ
+
+        sendMessage(device, ch, 0xB0 + ch, 123, byte2);
+        std::cout << "  AllNotesOff";
+        std::cout << " " << 123 << " " << byte2;
     }
 
     std::cout << std::endl;
@@ -158,19 +179,39 @@ void sendMessage(int device, int channel, int byte0, int byte1, int byte2)
         exit(1);
     }
 
-    std::cout << "  device: " << device << " " << deviceInfo.name << std::endl;
-    std::cout << "  channel: " << channel << std::endl;
+    std::stringstream hex0, hex1, hex2;
+    hex0 << std::hex << std::uppercase << byte0 << "h";
+    hex1 << std::hex << std::uppercase << byte1 << "h";
+    hex2 << std::hex << std::uppercase << byte2 << "h";
 
-    if (byte0 == 0x90)      // Note On
+    std::cout << "  device : " << device << " " << deviceInfo.name << std::endl;
+    std::cout << "  channel: " << channel << std::endl;
+    std::cout << "  bytes  : " << hex0.str() << " " << hex1.str() << " " << hex2.str();
+    std::cout << " (" << byte0 << " " << byte1 << " " << byte2 << ")" << std::endl;
+
+    int msgtype = byte0 & 0xF0;
+
+    if (msgtype == 0x90)      // Note On
     {
         auto msg = juce::MidiMessage::noteOn(channel, byte1, (juce::uint8)byte2);
         midiOutput->sendMessageNow(msg);
-        //std::cout << "Note On message sent." << std::endl;
     }
-    else if (byte0 == 0x80) // Note Off
+    else if (msgtype == 0x80) // Note Off
     {
         auto msg = juce::MidiMessage::noteOff(channel, byte1, (juce::uint8)byte2);
         midiOutput->sendMessageNow(msg);
-        //std::cout << "Note On message sent." << std::endl;
+    }
+    else if (msgtype == 0xB0) // CC
+    {
+        if (byte1 == 120) // All Sound Off
+        {
+            auto msg = juce::MidiMessage::allSoundOff(channel);
+            midiOutput->sendMessageNow(msg);
+        }
+        else if (byte1 == 123) // All Notes Off
+        {
+            auto msg = juce::MidiMessage::allNotesOff(channel);
+            midiOutput->sendMessageNow(msg);
+        }
     }
 }
