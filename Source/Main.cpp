@@ -14,88 +14,95 @@
 
 void usage(void);
 void listDevices(void);
-int getNumber(std::string s);
 std::string toLower(std::string s);
 void sendMessage(int device, int channel, int byte0, int byte1, int byte2);
+
+bool isAlphabet(std::string s);
+bool isInt128(std::string s);
+bool isInt256(std::string s);
+int getNumber(std::string s);
+
 
 //==============================================================================
 int main (int argc, char* argv[])
 {
-    if (argc < 2) { usage(); }
+    std::string arg[10];
+    if (argc > 10)
+    {
+        argc = 10;
+    }
+    for (int i = 0; i < argc; i++)
+    {
+        arg[i] = argv[i];
+    }
+    for (int i = argc; i < 10; i++)
+    {
+        arg[i] = "";
+    }
 
-    std::string arg = argv[1];
-    if ((argc == 2) && (arg == "list"))
+
+    ////// (1) mider ////////
+    if (arg[1] == "") { usage(); }
+
+
+    ////// (2) mider list ////////
+    if ((arg[1] == "list") && (arg[2] == ""))
     {
         listDevices();
         return 0;
     }
 
-    // 正規表現パターン
-    std::regex re_number(R"(\d?\d?\d)");
-    std::regex re_hex(R"(\d?\d?\dh)");
-    //std::regex re_command(R"([a-z]+)");
-    std::smatch match;
-
-    if (argc < 4) { usage(); }
-
     int device = 0;
     int ch = 0;
+    std::string cmd;
+    int byte1 = 0;
+    int byte2 = 0;
 
-    // Device
-    arg = argv[1];
-    if (std::regex_match(arg, match, re_number))
+    ////// (3) mider device port "cc" cc_command byte2 ////////
+    if (isInt128(arg[1]) && isInt128(arg[2]) && (arg[3] == "cc") && isAlphabet(arg[4]))
     {
-        device = std::stoi(match[0].str());
+        device = std::stoi(arg[1]);
+        ch = std::stoi(arg[2]);
+        cmd = toLower(arg[4]);
+        byte2 = getNumber(arg[5]);
+
+        if (cmd == "allsoundoff")
+        {
+            int code = 120;
+            sendMessage(device, ch, 0xB0 + ch, code, byte2);
+            std::cout << "  AllSoundOff";
+            std::cout << " " << code << " " << byte2;
+        }
+        else if (cmd == "allnotesoff")
+        {
+            int code = 123;
+            sendMessage(device, ch, 0xB0 + ch, code, byte2);
+            std::cout << "  AllSoundOff";
+            std::cout << " " << code << " " << byte2;
+        }
     }
-    else { usage(); }
 
-    // Channel
-    arg = argv[2];
-    if (std::regex_match(arg, match, re_number))
+    ////// (4) mider device port command byte1 byte2 ////////
+    if (isInt128(arg[1]) && isInt128(arg[2]) && isAlphabet(arg[3]))
     {
-        ch = std::stoi(match[0].str());
-    }
-    else { usage(); }
+        device = std::stoi(arg[1]);
+        ch = std::stoi(arg[2]);
+        cmd = toLower(arg[3]);
+        byte1 = getNumber(arg[4]);
+        byte2 = getNumber(arg[5]);
 
-    // Command
-    std::string cmd[3];
-    cmd[0] = toLower(argv[3]);
-    cmd[1] = (argc > 4) ? argv[4] : "0";
-    cmd[2] = (argc > 5) ? argv[5] : "0";
-    int byte1 = getNumber(cmd[1]);
-    int byte2 = getNumber(cmd[2]);
-
-    if (cmd[0] == "noteon")
-    {
-        sendMessage(device, ch, 0x90 + ch, byte1, byte2);
-        std::cout << "  NoteOn";
-        std::cout << " " << byte1 << " " << byte2;
-    }
-    else if (cmd[0] == "noteoff")
-    {
-        sendMessage(device, ch, 0x80 + ch, byte1, byte2);
-        std::cout << "  NoteOff";
-        std::cout << " " << byte1 << " " << byte2;
-    }
-    else if (cmd[0] == "allsoundoff")
-    {
-        // TODO: CCとしての書き方検討
-        // check argv[4]が省略または120であること
-        // check argv[5]が省略または0であること
-
-        sendMessage(device, ch, 0xB0 + ch, 120, byte2);
-        std::cout << "  AllSoundOff";
-        std::cout << " " << 120 << " " << byte2;
-    }
-    else if (cmd[0] == "allnotesoff")
-    {
-        // TODO: CCとしての書き方検討
-        // check argv[4]が省略または123であること
-        // check argv[5]が省略または0であること
-
-        sendMessage(device, ch, 0xB0 + ch, 123, byte2);
-        std::cout << "  AllNotesOff";
-        std::cout << " " << 123 << " " << byte2;
+        if (cmd == "noteon")
+        {
+            sendMessage(device, ch, 0x90 + ch, byte1, byte2);
+            std::cout << "  NoteOn";
+            std::cout << " " << byte1 << " " << byte2;
+        }
+        else if (cmd == "noteoff")
+        {
+            sendMessage(device, ch, 0x80 + ch, byte1, byte2);
+            std::cout << "  NoteOff";
+            std::cout << " " << byte1 << " " << byte2;
+        }
     }
 
     std::cout << std::endl;
@@ -124,31 +131,6 @@ void listDevices(void)
     std::cout << std::endl;
 }
 
-int getNumber(std::string s)
-{
-    std::regex re_dec(R"(\d?\d?\d)");
-    std::regex re_hex(R"(\d?\d?\dh)");
-    std::smatch match;
-    int value = 0;
-
-    if (std::regex_match(s, match, re_dec))
-    {
-        value = std::stoi(match[0].str());
-    }
-    else if (std::regex_match(s, match, re_hex))
-    {
-        s.pop_back();
-        value = std::stoi(match[0].str(), nullptr, 16);
-    }
-
-    if (value > 127)
-    {
-        std::cerr << "ERROR; number must be 0..127";
-        exit(1);
-    }
-
-    return value;
-}
 
 std::string toLower(std::string s)
 {
@@ -215,3 +197,58 @@ void sendMessage(int device, int channel, int byte0, int byte1, int byte2)
         }
     }
 }
+
+
+
+bool isAlphabet(std::string s)
+{
+    std::regex re_command(R"([a-zA-Z]+)");
+    std::smatch match;
+
+    if (std::regex_match(s, match, re_command))
+    {
+        return true;
+    }
+    return false;
+}
+
+bool isInt128(std::string s)
+{
+    int n = getNumber(s);
+    if ((n < 0) || (n > 127))
+    {
+        return false;
+    }
+    return true;
+}
+
+bool isInt256(std::string s)
+{
+    int n = getNumber(s);
+    if ((n < 0) || (n > 255))
+    {
+        return false;
+    }
+    return true;
+}
+
+int getNumber(std::string s)
+{
+    std::regex re_dec(R"(\d?\d?\d)");
+    std::regex re_hex(R"(\d?\d?\dh)");
+    std::smatch match;
+    int value = -1;
+
+    if (std::regex_match(s, match, re_dec))
+    {
+        value = std::stoi(match[0].str());
+    }
+    else if (std::regex_match(s, match, re_hex))
+    {
+        s.pop_back();
+        value = std::stoi(match[0].str(), nullptr, 16);
+    }
+
+    return value;
+}
+
