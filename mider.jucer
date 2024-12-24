@@ -5,6 +5,8 @@
               companyWebsite="https://github.com/aike">
   <MAINGROUP id="qSDJrU" name="mider">
     <GROUP id="{E2E60F9A-B0B1-FBD4-1B72-6FE15172E7CE}" name="Source">
+      <FILE id="XAQsAn" name="Help.cpp" compile="1" resource="0" file="Source/Help.cpp"/>
+      <FILE id="mnQSM5" name="Help.h" compile="0" resource="0" file="Source/Help.h"/>
       <FILE id="E7wAFH" name="Main.cpp" compile="1" resource="0" file="Source/Main.cpp"/>
     </GROUP>
   </MAINGROUP>

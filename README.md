@@ -9,9 +9,16 @@ simple command-line MIDI messaging tool
 
 ## Usage
 ```
- mider list
+ mider devices
+
+ mider help
+ mider help noteon
+ mider help cc
+ mider help cc allnotesoff
+
  mider device channel command [byte1 [byte2]]
- mider device byte0 [byte1 [byte2]]
+
+ mider device byte0 byte1 byte2
 ```
 
 ## Command

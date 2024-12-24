@@ -12,18 +12,20 @@
 #include <algorithm>
 #include <sstream>
 
+#include "Help.h"
+
 void usage(void);
 void listDevices(void);
 std::string toLower(std::string s);
 void sendMessage(int device, int channel, int byte0, int byte1, int byte2);
 
 bool isAlphabet(std::string s);
+bool isInt1to16(std::string s);
 bool isInt128(std::string s);
 bool isInt256(std::string s);
-int getNumber(std::string s);
+int getNumber(std::string s, int defval = -1);
 
-std::string toString(int byte0, int byte1, int byte2);
-
+Help h;
 
 //==============================================================================
 int main (int argc, char* argv[])
@@ -60,48 +62,47 @@ int main (int argc, char* argv[])
     }
 
     int device = 0;
-    int ch = 0;
+    int ch0 = 0;
     std::string cmd;
     int byte0 = 0;
     int byte1 = 0;
     int byte2 = 0;
 
-    ////// (3) mider device port "cc" cc_command byte2 ////////
-    if (isInt128(arg[1]) && isInt128(arg[2]) && (arg[3] == "cc") && isAlphabet(arg[4]))
+    ////// (3) mider device channel "cc" cc_command byte2 ////////
+    if (isInt128(arg[1]) && isInt1to16(arg[2]) && (arg[3] == "cc") && isAlphabet(arg[4]) && isInt256(arg[5]))
     {
         device = std::stoi(arg[1]);
-        ch = std::stoi(arg[2]);
+        ch0 = std::stoi(arg[2]) - 1;
         cmd = toLower(arg[4]);
-        int n = getNumber(arg[5]);
-        byte2 = (n < 0) ? 0 : n;
+        int n = getNumber(arg[5], 0);
 
-        if      (cmd == "allsoundoff") { sendMessage(device, ch, 0xB0 + ch, 120, byte2); }
-        else if (cmd == "allnotesoff") { sendMessage(device, ch, 0xB0 + ch, 123, byte2); }
+        if      (cmd == "allsoundoff") { sendMessage(device, ch0, 0xB0 + ch0, 120, byte2); }
+        else if (cmd == "allnotesoff") { sendMessage(device, ch0, 0xB0 + ch0, 123, byte2); }
     }
 
-    ////// (4) mider device port command byte1 byte2 ////////
-    else if (isInt128(arg[1]) && isInt128(arg[2]) && isAlphabet(arg[3]))
+    ////// (4) mider device channel command byte1 byte2 ////////
+    else if (isInt128(arg[1]) && isInt1to16(arg[2]) && isAlphabet(arg[3]))
     {
         device = std::stoi(arg[1]);
-        ch = std::stoi(arg[2]);
+        ch0 = std::stoi(arg[2]) - 1;
         cmd = toLower(arg[3]);
-        byte1 = getNumber(arg[4]);
-        byte2 = getNumber(arg[5]);
+        byte1 = getNumber(arg[4], 0);
+        byte2 = getNumber(arg[5], 0);
 
-        if      (cmd == "noteon")  { sendMessage(device, ch, 0x90 + ch, byte1, byte2); }
-        else if (cmd == "noteoff") { sendMessage(device, ch, 0x80 + ch, byte1, byte2); }
+        if      (cmd == "noteon")  { sendMessage(device, ch0, 0x90 + ch0, byte1, byte2); }
+        else if (cmd == "noteoff") { sendMessage(device, ch0, 0x80 + ch0, byte1, byte2); }
     }
 
     ////// (5) mider device byte0 byte1 byte2 ////////
-    else if (isInt128(arg[1]) && isInt128(arg[2]) && isInt256(arg[3]) && isInt256(arg[4]) && isInt256(arg[5]))
+    else if (isInt128(arg[1]) && isInt256(arg[2]) && isInt256(arg[3]) && isInt256(arg[4]))
     {
         device = std::stoi(arg[1]);
-        ch    = getNumber(arg[3]) & 0x0F;
-        byte0 = getNumber(arg[3]);
-        byte1 = getNumber(arg[4]);
-        byte2 = getNumber(arg[5]);
+        ch0    = getNumber(arg[2]) & 0x0F;
+        byte0 = getNumber(arg[2]);
+        byte1 = getNumber(arg[3]);
+        byte2 = getNumber(arg[4]);
 
-        sendMessage(device, ch, 0x90 + ch, byte1, byte2);
+        sendMessage(device, ch0, 0x90 + ch0, byte1, byte2);
     }
 
 
@@ -169,10 +170,11 @@ void sendMessage(int device, int channel, int byte0, int byte1, int byte2)
     hex1 << std::hex << std::uppercase << byte1 << "h";
     hex2 << std::hex << std::uppercase << byte2 << "h";
     std::cout << "  device : " << device << " " << deviceInfo.name << std::endl;
-    std::cout << "  channel: " << channel << std::endl;
+    std::cout << "  channel: " << (channel + 1) << std::endl;
     std::cout << "  bytes  : " << hex0.str() << " " << hex1.str() << " " << hex2.str();
     std::cout << " (" << byte0 << " " << byte1 << " " << byte2 << ")" << std::endl;
-    std::cout << "  " << toString(byte0, byte1, byte2) << std::endl;
+    std::cout << std::endl;
+    std::cout << "  " << h.toString(byte0 & 0xF0, byte1, byte2) << std::endl;
 
     // send message
     auto msg = juce::MidiMessage(byte0, byte1, byte2);
@@ -191,6 +193,17 @@ bool isAlphabet(std::string s)
         return true;
     }
     return false;
+}
+
+
+bool isInt1to16(std::string s)
+{
+    int n = getNumber(s);
+    if ((n < 1) || (n > 16))
+    {
+        return false;
+    }
+    return true;
 }
 
 bool isInt128(std::string s)
@@ -213,7 +226,7 @@ bool isInt256(std::string s)
     return true;
 }
 
-int getNumber(std::string s)
+int getNumber(std::string s, int defval)
 {
     std::regex re_dec(R"(\d?\d?\d)");
     std::regex re_hex(R"(\d?\d?\dh)");
@@ -231,23 +244,5 @@ int getNumber(std::string s)
     }
 
     return value;
-}
-
-
-std::string toString(int byte0, int byte1, int byte2)
-{
-    std::string s = "";
-
-    int cmd = byte0 & 0xF0;
-    if      (cmd == 0x90) { s = "[NoteOn]  note number:" + std::to_string(byte1) + " velocity:" + std::to_string(byte2); }
-    else if (cmd == 0x80) { s = "[NoteOff] note number:" + std::to_string(byte1) + " velocity:" + std::to_string(byte2); }
-
-    else if (cmd == 0xB0) {
-        int cc_cmd = byte1;
-        if      (cc_cmd == 0x78) { s = "[CC] [All Sound Off] byte2(to be zero):" + std::to_string(byte2); }
-        else if (cc_cmd == 0x7B) { s = "[CC] [All Notes Off] byte2(to be zero):" + std::to_string(byte2); }
-    }
-
-    return s;
 }
 
