@@ -9,6 +9,8 @@
 
 #include <algorithm>
 #include <cctype>
+#include <iomanip>
+#include <sstream>
 
 #include "Help.h"
 
@@ -19,7 +21,28 @@ std::string Help::commandName(int n)
     {
         return byte0[n];
     }
+    return "";
+}
 
+std::string Help::commandHelp(int n)
+{
+    if (n < 256)
+    {
+        std::stringstream hex;
+        hex << std::setfill('0') << std::setw(2) << std::hex << std::uppercase << n << "h";
+        return hex.str() + " " + fmt(byte0[n], 23) + "| " + fmt(byte1[n], 21) + "| " + byte2[n];
+    }
+    return "";
+}
+
+std::string Help::commandHelp1(int n)
+{
+    if (n < 256)
+    {
+        std::stringstream hex;
+        hex << std::setfill('0') << std::setw(2) << std::hex << std::uppercase << n << "h";
+        return hex.str() + " " + byte0[n] + " | " + byte1[n] + " | " + byte2[n];
+    }
     return "";
 }
 
@@ -41,6 +64,37 @@ int Help::ccCommandNumber(std::string s)
     return -1;
 }
 
+std::string Help::ccCommandName(int n)
+{
+    if (n < 256)
+    {
+        return cc1[n];
+    }
+    return "";
+}
+
+
+std::string Help::ccCommandHelp(int n)
+{
+    if (n < 256)
+    {
+        std::stringstream hex;
+        hex << std::setfill('0') << std::setw(2) << std::hex << std::uppercase << n << "h";
+        return hex.str() + " " + fmt(cc1[n], 31) + "| " + cc2[n];
+    }
+    return "";
+}
+
+std::string Help::ccCommandHelp1(int n)
+{
+    if (n < 256)
+    {
+        std::stringstream hex;
+        hex << std::setfill('0') << std::setw(2) << std::hex << std::uppercase << n << "h";
+        return hex.str() + " " + cc1[n] + " | " + cc2[n];
+    }
+    return "";
+}
 
 std::string Help::ccName(int n)
 {
@@ -102,4 +156,13 @@ std::string Help::toAbbreviation(const std::string& in_s)
         }
     }
     return out_s;
+}
+
+std::string Help::fmt(std::string s, int width)
+{
+    if (s.size() < width)
+    {
+        return s + std::string(width - s.size(), ' ');
+    }
+    return s;
 }

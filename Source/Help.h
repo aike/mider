@@ -151,10 +151,15 @@ public:
     ~Help() {};
 
     std::string commandName(int n);
+    std::string commandHelp(int n);
+    std::string commandHelp1(int n);
     int commandNumber(std::string s);
+    std::string ccCommandName(int n);
+    std::string ccCommandHelp(int n);
+    std::string ccCommandHelp1(int n);
     int ccCommandNumber(std::string s);
     std::string ccName(int n);
-    std::string Help::toString(int byte0, int byte1, int byte2);
+    std::string toString(int byte0, int byte1, int byte2);
 
 private:
     std::string byte0[256];
@@ -168,7 +173,7 @@ private:
 
     std::string toLowerNoSpace(const std::string& in_s);
     std::string toAbbreviation(const std::string& in_s);
-
+    std::string fmt(std::string s, int width);
 };
 
 

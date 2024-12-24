@@ -59,11 +59,6 @@ int main (int argc, char* argv[])
         listDevices();
         return 0;
     }
-    else if ((arg[1] == "help") && (arg[2] == ""))
-    {
-        usage();
-        return 1;
-    }
 
     ////// (2) mider device channel command byte1 byte2 ////////
     else if (isInt128(arg[1]) && isInt1to16(arg[2]) && isAlphabet(arg[3]) && !isAlphabet(arg[4]))
@@ -76,8 +71,8 @@ int main (int argc, char* argv[])
 
         if (byte0 < 0)
         {
-            usage();
-            return 1;
+            std::cerr << "ERROR: Massage name(" << arg[3] << ") not found." << std::endl;
+            exit(1);
         }
 
         sendMessage(device, ch0, byte0 + ch0, byte1, byte2);
@@ -92,10 +87,15 @@ int main (int argc, char* argv[])
         int byte1 = h.ccCommandNumber(toLower(arg[4]));
         int byte2 = getNumber(arg[5], 0);
 
-        if ((byte0 != 0xB0) || (byte1 < 0))
+        if (byte0 != 0xB0)
         {
-            usage();
-            return 1;
+            std::cerr << "ERROR: Argument syntax error." << std::endl;
+            exit(1);
+        }
+        if (byte1 < 0)
+        {
+            std::cerr << "ERROR: CC name(" << arg[4] << ") not found." << std::endl;
+            exit(1);
         }
 
         sendMessage(device, ch0, byte0 + ch0, byte1, byte2);
@@ -111,6 +111,83 @@ int main (int argc, char* argv[])
         int byte2  = getNumber(arg[4]);
 
         sendMessage(device, ch0, byte0 + ch0, byte1, byte2);
+    }
+
+    ////// (5) mider help ////////
+    else if (arg[1] == "help")
+    {
+        if (arg[2] == "")
+        {
+            std::cout << std::endl;
+            std::cout << "Message Help:" << std::endl;
+            for (int i = 0; i < 256; i++)
+            {
+                if (h.commandName(i) != "Undefined")
+                {
+                    std::cout << "  " << h.commandHelp(i) << std::endl;
+                }
+            }
+            std::cout << std::endl;
+        }
+        else if (isAlphabet(arg[2]) && arg[3] == "")
+        {
+            int n = h.commandNumber(arg[2]);
+            if (n < 0)
+            {
+                std::cout << arg[2] << " is not a message." << std::endl;
+                exit(1);
+            }
+
+            std::cout << std::endl;
+            std::cout << "Message Help:" << std::endl;
+            std::cout << "  " << h.commandHelp1(n) << std::endl;
+            if (h.commandName(n) == "Control Change")
+            {
+                std::cout << std::endl;
+                std::cout << "Control Change Help:" << std::endl;
+                for (int i = 0; i < 256; i++)
+                {
+                    if (h.ccCommandName(i) != "Undefined")
+                    {
+                        std::cout << "  " << h.ccCommandHelp(i) << std::endl;
+                    }
+                }
+            }
+        }
+        else if (isAlphabet(arg[2]) && isAlphabet(arg[3]))
+        {
+            int n = h.commandNumber(arg[2]);
+            if (h.commandName(n) != "Control Change")
+            {
+                std::cout << arg[2] << " is not a message." << std::endl;
+                exit(1);
+            }
+
+            int m = h.ccCommandNumber(arg[3]);
+            if (m < 0)
+            {
+                std::cout << arg[3] << " is not a control change." << std::endl;
+                exit(1);
+            }
+
+//            std::cout << std::endl;
+//            std::cout << std::endl;
+//            std::cout << "Message Help:" << std::endl;
+//            std::cout << "  " << h.commandHelp1(n) << std::endl;
+            std::cout << std::endl;
+            std::cout << "Control Change Help:" << std::endl;
+            std::cout << "  B0h Control Change | " << h.ccCommandHelp1(m) << std::endl;
+        }
+        std::cout << std::endl;
+
+        return 0;
+    }
+
+    ////// the other argument pattern /////////
+    else
+    {
+        std::cerr << "ERROR: Argument syntax error." << std::endl;
+        exit(1);
     }
 
     return 0;
@@ -131,7 +208,6 @@ void usage(void)
     std::cout << std::endl;
     std::cout << "Example:" << std::endl;
     std::cout << "    mider devices" << std::endl;
-    std::cout << std::endl;
     std::cout << "    mider 1 1 NoteOn 60 100" << std::endl;
     std::cout << "    mider 1 1 ControlChange DamperPedal 0" << std::endl;
     std::cout << "    mider 1 1 CC AllNotesOff" << std::endl;
@@ -213,7 +289,6 @@ void sendMessage(int device, int channel, int byte0, int byte1, int byte2)
 }
 
 
-
 bool isAlphabet(std::string s)
 {
     std::regex re_command(R"(^[a-zA-Z]+$)");
@@ -225,7 +300,6 @@ bool isAlphabet(std::string s)
     }
     return false;
 }
-
 
 bool isInt1to16(std::string s)
 {
@@ -260,8 +334,8 @@ bool isInt256(std::string s)
 int getNumber(std::string s, int defval)
 {
     std::regex re_dec(R"(^\d?\d?\d$)");
-    std::regex re_hex1(R"(^\d?\d?\dh$)");
-    std::regex re_hex2(R"(^0x\d?\d?\d$)");
+    std::regex re_hex1(R"(^[0-9a-fA-F]?[0-9a-fA-F]h$)");
+    std::regex re_hex2(R"(^0x[0-9a-fA-F]?[0-9a-fA-F]$)");
     std::smatch match;
     int value = defval;
 
