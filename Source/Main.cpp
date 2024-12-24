@@ -120,7 +120,7 @@ void usage(void)
 {
     std::cout << std::endl;
     std::cout << "Usage:" << std::endl;
-    std::cout << "    (1) mider \"device\"" << std::endl;
+    std::cout << "    (1) mider \"devices\"" << std::endl;
     std::cout << "    (2) mider device_number channel_number message_name [byte1] [byte2]" << std::endl;
     std::cout << "    (3) mider device_number channel_number \"CC\" cc_name [byte2]" << std::endl;
     std::cout << "    (4) mider device_number byte0 byte1 byte2" << std::endl;
@@ -130,7 +130,7 @@ void usage(void)
     std::cout << "        mider \"help\" \"CC\" cc_name" << std::endl;
     std::cout << std::endl;
     std::cout << "Example:" << std::endl;
-    std::cout << "    mider device" << std::endl;
+    std::cout << "    mider devices" << std::endl;
     std::cout << std::endl;
     std::cout << "    mider 1 1 NoteOn 60 100" << std::endl;
     std::cout << "    mider 1 1 ControlChange DamperPedal 0" << std::endl;
