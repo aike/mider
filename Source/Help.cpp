@@ -91,7 +91,14 @@ std::string Help::ccCommandHelp1(int n)
     {
         std::stringstream hex;
         hex << std::setfill('0') << std::setw(2) << std::hex << std::uppercase << n << "h";
-        return hex.str() + " " + cc1[n] + " | " + cc2[n];
+        std::string s = hex.str();
+        if (n <= 0x13)
+        {
+            std::stringstream hex2;
+            hex2 << std::setfill('0') << std::setw(2) << std::hex << std::uppercase << (n + 0x20) << "h";
+            s += "/" + hex2.str();
+        }
+        return s + " " + cc1[n] + " | " + cc2[n];
     }
     return "";
 }

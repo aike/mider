@@ -291,7 +291,7 @@ void sendMessage(int device, int channel, int byte0, int byte1, int byte2)
 
 bool isAlphabet(std::string s)
 {
-    std::regex re_command(R"(^[a-zA-Z]+$)");
+    std::regex re_command(R"(^[a-zA-Z][a-zA-Z0-9]*$)");
     std::smatch match;
 
     if (std::regex_match(s, match, re_command))

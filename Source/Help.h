@@ -123,13 +123,13 @@ public:
             if (byte0[n] != "Undefined")
             {
                 cmd[toLowerNoSpace(byte0[n])] = n;
-            }
 
-            // 複数単語からなるコマンド名は略語も辞書登録する
-            // ex. "Control Change"→"cc"  cmd["cc"] = 0xB0
-            if (byte0[n].find(' ') != std::string::npos)
-            {
-                cmd[toAbbreviation(byte0[n])] = n;
+                // 複数単語からなるコマンド名は略語も辞書登録する
+                // ex. "Control Change"→"cc"  cmd["cc"] = 0xB0
+                if (byte0[n].find(' ') != std::string::npos)
+                {
+                    cmd[toAbbreviation(byte0[n])] = n;
+                }
             }
         }
 
@@ -138,12 +138,15 @@ public:
         {
             if (cc1[n] != "Undefined")
             {
-                cc_cmd[toLowerNoSpace(cc1[n])] = n;
-            }
+                if (cc_cmd.find(toLowerNoSpace(cc1[n])) == cc_cmd.end())
+                {
+                    cc_cmd[toLowerNoSpace(cc1[n])] = n;
 
-            if (cc1[n].find(' ') != std::string::npos)
-            {
-                cc_cmd[toAbbreviation(cc1[n])] = n;
+                    if (cc1[n].find(' ') != std::string::npos)
+                    {
+                        cc_cmd[toAbbreviation(cc1[n])] = n;
+                    }
+                }
             }
         }
     };
