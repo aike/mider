@@ -23,6 +23,25 @@ std::string Help::commandName(int n)
     return "";
 }
 
+int Help::commandNumber(std::string s)
+{
+    if (cmd.find(s) != cmd.end())
+    {
+        return cmd[s];
+    }
+    return -1;
+}
+
+int Help::ccCommandNumber(std::string s)
+{
+    if (cc_cmd.find(s) != cc_cmd.end())
+    {
+        return cc_cmd[s];
+    }
+    return -1;
+}
+
+
 std::string Help::ccName(int n)
 {
     if (n < 256)
@@ -39,7 +58,7 @@ std::string Help::toString(int b0, int b1, int b2)
     int command = b0 & 0xF0;
     if (commandName(command) == "Control Change")
     {
-        s = "[CC] [" + cc1[b1] + "] " + cc2[b1] + ":" + std::to_string(b2);
+        s = "[CC] [" + cc1[b1] + "] [" + cc2[b1] + ":" + std::to_string(b2) + "]";
     }
     else
     {

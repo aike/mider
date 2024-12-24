@@ -105,14 +105,14 @@ public:
         n = 0x63; cc1[n] = "NRPN MSB";             cc2[n] = "value(0-127)";
         n = 0x64; cc1[n] = "RPN LSB";              cc2[n] = "value(0-127)";
         n = 0x65; cc1[n] = "RPN MSB";              cc2[n] = "value(0-127)";
-        n = 0x78; cc1[n] = "All Sound Off";        cc2[n] = "0";
-        n = 0x79; cc1[n] = "Reset All Controller"; cc2[n] = "0";
+        n = 0x78; cc1[n] = "All Sound Off";        cc2[n] = "always zero";
+        n = 0x79; cc1[n] = "Reset All Controller"; cc2[n] = "always zero";
         n = 0x7A; cc1[n] = "Local on/off Switch";  cc2[n] = "0:Off/127:On";
-        n = 0x7B; cc1[n] = "All Notes Off";        cc2[n] = "0";
-        n = 0x7C; cc1[n] = "Omni Mode Off";        cc2[n] = "0";
-        n = 0x7D; cc1[n] = "Omni Mode On";         cc2[n] = "0";
+        n = 0x7B; cc1[n] = "All Notes Off";        cc2[n] = "always zero";
+        n = 0x7C; cc1[n] = "Omni Mode Off";        cc2[n] = "always zero";
+        n = 0x7D; cc1[n] = "Omni Mode On";         cc2[n] = "always zero";
         n = 0x7E; cc1[n] = "Mono Mode";            cc2[n] = "0(Omni On)/number of voices(Omni Off)";
-        n = 0x7F; cc1[n] = "Poly Mode";            cc2[n] = "0";
+        n = 0x7F; cc1[n] = "Poly Mode";            cc2[n] = "always zero";
 
 
         // command name to number
@@ -143,7 +143,7 @@ public:
 
             if (cc1[n].find(' ') != std::string::npos)
             {
-                cmd[toAbbreviation(cc1[n])] = n;
+                cc_cmd[toAbbreviation(cc1[n])] = n;
             }
         }
     };
@@ -151,6 +151,8 @@ public:
     ~Help() {};
 
     std::string commandName(int n);
+    int commandNumber(std::string s);
+    int ccCommandNumber(std::string s);
     std::string ccName(int n);
     std::string Help::toString(int byte0, int byte1, int byte2);
 

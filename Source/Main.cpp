@@ -46,12 +46,15 @@ int main (int argc, char* argv[])
     }
 
 
-    ////// (1) mider ////////
-    if (arg[1] == "") { usage(); }
+    ////// (0) mider ////////
+    if (arg[1] == "")
+    {
+        usage();
+        return 1;
+    }
 
-
-    ////// (2) mider list ////////
-    if ((arg[1] == "list") && (arg[2] == ""))
+    ////// (1) mider devices ////////
+    else if ((arg[1] == "devices") && (arg[2] == ""))
     {
         listDevices();
         return 0;
@@ -59,63 +62,89 @@ int main (int argc, char* argv[])
     else if ((arg[1] == "help") && (arg[2] == ""))
     {
         usage();
+        return 1;
     }
 
-    int device = 0;
-    int ch0 = 0;
-    std::string cmd;
-    int byte0 = 0;
-    int byte1 = 0;
-    int byte2 = 0;
+    ////// (2) mider device channel command byte1 byte2 ////////
+    else if (isInt128(arg[1]) && isInt1to16(arg[2]) && isAlphabet(arg[3]) && !isAlphabet(arg[4]))
+    {
+        int device = std::stoi(arg[1]);
+        int ch0    = std::stoi(arg[2]) - 1;
+        int byte0  = h.commandNumber(toLower(arg[3]));
+        int byte1  = getNumber(arg[4], 0);
+        int byte2  = getNumber(arg[5], 0);
+
+        if (byte0 < 0)
+        {
+            usage();
+            return 1;
+        }
+
+        sendMessage(device, ch0, byte0 + ch0, byte1, byte2);
+    }
 
     ////// (3) mider device channel "cc" cc_command byte2 ////////
-    if (isInt128(arg[1]) && isInt1to16(arg[2]) && (arg[3] == "cc") && isAlphabet(arg[4]) && isInt256(arg[5]))
+    else if (isInt128(arg[1]) && isInt1to16(arg[2]) && isAlphabet(arg[3]) && isAlphabet(arg[4]))
     {
-        device = std::stoi(arg[1]);
-        ch0 = std::stoi(arg[2]) - 1;
-        cmd = toLower(arg[4]);
-        int n = getNumber(arg[5], 0);
+        int device = std::stoi(arg[1]);
+        int ch0 = std::stoi(arg[2]) - 1;
+        int byte0 = h.commandNumber(toLower(arg[3]));
+        int byte1 = h.ccCommandNumber(toLower(arg[4]));
+        int byte2 = getNumber(arg[5], 0);
 
-        if      (cmd == "allsoundoff") { sendMessage(device, ch0, 0xB0 + ch0, 120, byte2); }
-        else if (cmd == "allnotesoff") { sendMessage(device, ch0, 0xB0 + ch0, 123, byte2); }
+        if ((byte0 != 0xB0) || (byte1 < 0))
+        {
+            usage();
+            return 1;
+        }
+
+        sendMessage(device, ch0, byte0 + ch0, byte1, byte2);
     }
 
-    ////// (4) mider device channel command byte1 byte2 ////////
-    else if (isInt128(arg[1]) && isInt1to16(arg[2]) && isAlphabet(arg[3]))
-    {
-        device = std::stoi(arg[1]);
-        ch0 = std::stoi(arg[2]) - 1;
-        cmd = toLower(arg[3]);
-        byte1 = getNumber(arg[4], 0);
-        byte2 = getNumber(arg[5], 0);
-
-        if      (cmd == "noteon")  { sendMessage(device, ch0, 0x90 + ch0, byte1, byte2); }
-        else if (cmd == "noteoff") { sendMessage(device, ch0, 0x80 + ch0, byte1, byte2); }
-    }
-
-    ////// (5) mider device byte0 byte1 byte2 ////////
+    ////// (4) mider device byte0 byte1 byte2 ////////
     else if (isInt128(arg[1]) && isInt256(arg[2]) && isInt256(arg[3]) && isInt256(arg[4]))
     {
-        device = std::stoi(arg[1]);
-        ch0    = getNumber(arg[2]) & 0x0F;
-        byte0 = getNumber(arg[2]);
-        byte1 = getNumber(arg[3]);
-        byte2 = getNumber(arg[4]);
+        int device = std::stoi(arg[1]);
+        int ch0    = getNumber(arg[2]) & 0x0F;
+        int byte0  = getNumber(arg[2]);
+        int byte1  = getNumber(arg[3]);
+        int byte2  = getNumber(arg[4]);
 
-        sendMessage(device, ch0, 0x90 + ch0, byte1, byte2);
+        sendMessage(device, ch0, byte0 + ch0, byte1, byte2);
     }
-
-
-    std::cout << std::endl;
 
     return 0;
 }
 
 void usage(void)
 {
-    std::cout << "usage: mider dev ch message byte1 byte2";
-    std::cout << "       mider list";
-    exit(0);
+    std::cout << std::endl;
+    std::cout << "Usage:" << std::endl;
+    std::cout << "    (1) mider \"device\"" << std::endl;
+    std::cout << "    (2) mider device_number channel_number message_name [byte1] [byte2]" << std::endl;
+    std::cout << "    (3) mider device_number channel_number \"CC\" cc_name [byte2]" << std::endl;
+    std::cout << "    (4) mider device_number byte0 byte1 byte2" << std::endl;
+    std::cout << "    (5) mider \"help\"" << std::endl;
+    std::cout << "        mider \"help\" message_name" << std::endl;
+    std::cout << "        mider \"help\" \"CC\"" << std::endl;
+    std::cout << "        mider \"help\" \"CC\" cc_name" << std::endl;
+    std::cout << std::endl;
+    std::cout << "Example:" << std::endl;
+    std::cout << "    mider device" << std::endl;
+    std::cout << std::endl;
+    std::cout << "    mider 1 1 NoteOn 60 100" << std::endl;
+    std::cout << "    mider 1 1 ControlChange DamperPedal 0" << std::endl;
+    std::cout << "    mider 1 1 CC AllNotesOff" << std::endl;
+    std::cout << "    mider 1 1 cc ano" << std::endl;
+    std::cout << "    mider 1 144 60 100" << std::endl;
+    std::cout << "    mider 1 90h 3Ch 64h" << std::endl;
+    std::cout << "    mider 1 0x90 0x3C 0x64" << std::endl;
+    std::cout << std::endl;
+    std::cout << "    mider help" << std::endl;
+    std::cout << "    mider help NoteOn" << std::endl;
+    std::cout << "    mider help CC" << std::endl;
+    std::cout << "    mider help CC AllNotesOff" << std::endl;
+    std::cout << std::endl;
 }
 
 void listDevices(void)
@@ -152,7 +181,7 @@ void sendMessage(int device, int channel, int byte0, int byte1, int byte2)
     if (midiOutputDevices.isEmpty())
     {
         std::cerr << "ERROR: No MIDI output devices found." << std::endl;
-        exit(1);
+        exit(2);
     }
 
     // select device
@@ -161,20 +190,22 @@ void sendMessage(int device, int channel, int byte0, int byte1, int byte2)
     if (midiOutput == nullptr)
     {
         std::cerr << "ERROR: Failed to open MIDI output device." << std::endl;
-        exit(1);
+        exit(2);
     }
 
     // show dump
     std::stringstream hex0, hex1, hex2;
-    hex0 << std::hex << std::uppercase << byte0 << "h";
-    hex1 << std::hex << std::uppercase << byte1 << "h";
-    hex2 << std::hex << std::uppercase << byte2 << "h";
-    std::cout << "  device : " << device << " " << deviceInfo.name << std::endl;
+    hex0 << std::setfill('0') << std::setw(2) << std::hex << std::uppercase << byte0 << "h";
+    hex1 << std::setfill('0') << std::setw(2) << std::hex << std::uppercase << byte1 << "h";
+    hex2 << std::setfill('0') << std::setw(2) << std::hex << std::uppercase << byte2 << "h";
+    std::cout << std::endl;
+    std::cout << "  device : " << device << " \"" << deviceInfo.name << "\"" << std::endl;
     std::cout << "  channel: " << (channel + 1) << std::endl;
     std::cout << "  bytes  : " << hex0.str() << " " << hex1.str() << " " << hex2.str();
     std::cout << " (" << byte0 << " " << byte1 << " " << byte2 << ")" << std::endl;
     std::cout << std::endl;
     std::cout << "  " << h.toString(byte0 & 0xF0, byte1, byte2) << std::endl;
+    std::cout << std::endl;
 
     // send message
     auto msg = juce::MidiMessage(byte0, byte1, byte2);
@@ -185,7 +216,7 @@ void sendMessage(int device, int channel, int byte0, int byte1, int byte2)
 
 bool isAlphabet(std::string s)
 {
-    std::regex re_command(R"([a-zA-Z]+)");
+    std::regex re_command(R"(^[a-zA-Z]+$)");
     std::smatch match;
 
     if (std::regex_match(s, match, re_command))
@@ -228,18 +259,24 @@ bool isInt256(std::string s)
 
 int getNumber(std::string s, int defval)
 {
-    std::regex re_dec(R"(\d?\d?\d)");
-    std::regex re_hex(R"(\d?\d?\dh)");
+    std::regex re_dec(R"(^\d?\d?\d$)");
+    std::regex re_hex1(R"(^\d?\d?\dh$)");
+    std::regex re_hex2(R"(^0x\d?\d?\d$)");
     std::smatch match;
-    int value = -1;
+    int value = defval;
 
     if (std::regex_match(s, match, re_dec))
     {
         value = std::stoi(match[0].str());
     }
-    else if (std::regex_match(s, match, re_hex))
+    else if (std::regex_match(s, match, re_hex1))
     {
         s.pop_back();
+        value = std::stoi(match[0].str(), nullptr, 16);
+    }
+    else if (std::regex_match(s, match, re_hex2))
+    {
+        s.erase(0, 2);
         value = std::stoi(match[0].str(), nullptr, 16);
     }
 
