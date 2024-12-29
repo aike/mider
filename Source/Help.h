@@ -33,11 +33,11 @@ public:
         n = 0x90;  byte0[n] = "Note On";                 byte1[n] = "note number(0-127)";     byte2[n] = "velocity(0-127)";
         n = 0xA0;  byte0[n] = "Polyphonic Key Pressure"; byte1[n] = "note number(0-127)";     byte2[n] = "pressure(0-127)";
         n = 0xB0;  byte0[n] = "Control Change";          byte1[n] = "control number(0-127)";  byte2[n] = "control value(0-127)";
-        n = 0xC0;  byte0[n] = "Program Change";          byte1[n] = "program number(0-127)";  byte2[n] = "no use";
+        n = 0xC0;  byte0[n] = "Program Change";          byte1[n] = "program number(0-127)";  byte2[n] = "-";
         n = 0xD0;  byte0[n] = "Channel Pressure";        byte1[n] = "note number(0-127)";     byte2[n] = "pressure(0-127)";
         n = 0xE0;  byte0[n] = "Pitch Bend Change";       byte1[n] = "LSB(0-127)";             byte2[n] = "MSB(0-127)";
         // System Common Message
-        n = 0xF0;  byte0[n] = "SOX";                     byte1[n] = "tManufacturer ID";       byte2[n] = "-";
+        n = 0xF0;  byte0[n] = "SOX";                     byte1[n] = "Manufacturer ID";       byte2[n] = "-";
         n = 0xF1;  byte0[n] = "MIDI Time Code";          byte1[n] = "type / value(nnndddd)";  byte2[n] = "-";
         n = 0xF2;  byte0[n] = "Song Position Pointer";   byte1[n] = "LSB(0-127)";             byte2[n] = "MSB(0-127)";
         n = 0xF3;  byte0[n] = "Song Select";             byte1[n] = "song(0-127)";            byte2[n] = "-";
@@ -51,7 +51,7 @@ public:
         n = 0xFE;  byte0[n] = "Active Sensing";          byte1[n] = "-";                      byte2[n] = "-";
         n = 0xFF;  byte0[n] = "System Reset";            byte1[n] = "-";                      byte2[n] = "-";
 
-        // CC
+        // Control Change
         n = 0x00; cc1[n] = "Bank Select";          cc2[n] = "MSB(0-127)";
         n = 0x01; cc1[n] = "Modulation Wheel";     cc2[n] = "MSB(0-127)";
         n = 0x02; cc1[n] = "Breath Controller";    cc2[n] = "MSB(0-127)";
@@ -148,6 +148,8 @@ public:
                 }
             }
         }
+        cmd[toLowerNoSpace("Channel Mode")] = 0xB0;
+        cmd[toAbbreviation("Channel Mode")] = 0xB0;
 
         // CC command name to number
         for (n = 0; n < 256; n++)
@@ -165,6 +167,26 @@ public:
                 }
             }
         }
+        // additional CC command name (ex. BankSelect1)
+        for (n = 0x00; n < 0x14; n++)
+        {
+            if (cc1[n] != "Undefined")
+            {
+                auto s = cc1[n] + " 1";
+                cc_cmd[toLowerNoSpace(s)] = n;
+                cc_cmd[toAbbreviation(cc1[n])] = n;
+            }
+        }
+        // additional CC command name (ex. BankSelect2)
+        for (n = 0x20; n < 0x34; n++)
+        {
+            if (cc1[n] != "Undefined")
+            {
+                auto s = cc1[n] + " 2";
+                cc_cmd[toLowerNoSpace(s)] = n;
+                cc_cmd[toAbbreviation(cc1[n])] = n;
+            }
+        }
     };
 
     ~Help() {};
@@ -179,6 +201,7 @@ public:
     int ccCommandNumber(std::string s);
     std::string ccName(int n);
     std::string toString(int byte0, int byte1, int byte2);
+    int getMessageLength(int n);
 
 private:
     std::string byte0[256];

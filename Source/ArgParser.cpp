@@ -43,19 +43,43 @@ P ArgParser::parse(std::vector<std::string>arg)
     ////// (2) mider device channel command byte1 byte2 ////////
     else if (isInt128(arg[1]) && isInt1to16(arg[2]) && isAlphabet(arg[3]) && !isAlphabet(arg[4]))
     {
-        int device = std::stoi(arg[1]);
-        int ch0 = std::stoi(arg[2]) - 1;
+        device = std::stoi(arg[1]);
+        channel = std::stoi(arg[2]) - 1;
         int byte0 = h.commandNumber(toLower(arg[3]));
-        int byte1 = getNumber(arg[4], 0);
-        int byte2 = getNumber(arg[5], 0);
-
         if (byte0 < 0)
         {
             message = "ERROR: Massage name(" + arg[3] + ") not found.";
             return P::E_MSGNAME_ERROR;
         }
 
-        //sendMessage(device, ch0, byte0 + ch0, byte1, byte2);
+        int len = h.getMessageLength(byte0);
+        if (len == 1)
+        {
+            setBytes({ byte0 + channel });
+        }
+        else if (len == 2)
+        {
+            int byte1 = getNumber(arg[4]);
+            if (byte1 < 0)
+            {
+                message = "ERROR: Argument syntax error.\n";
+                message += "  " + h.commandHelp1(byte0);
+                return P::E_SYNTAX_ERROR;
+            }
+            setBytes({ byte0 + channel, byte1 });
+        }
+        else if (len == 3)
+        {
+            int byte1 = getNumber(arg[4]);
+            int byte2 = getNumber(arg[5]);
+            if ((byte1 < 0) || (byte2 < 0))
+            {
+                message = "ERROR: Argument syntax error.\n";
+                message += "  " + h.commandHelp1(byte0);
+                return P::E_SYNTAX_ERROR;
+            }
+            setBytes({ byte0 + channel, byte1, byte2 });
+        }
 
         return P::DEV_CH_MSGNAME;
     }
@@ -63,8 +87,8 @@ P ArgParser::parse(std::vector<std::string>arg)
     ////// (3) mider device channel "cc" cc_command byte2 ////////
     else if (isInt128(arg[1]) && isInt1to16(arg[2]) && isAlphabet(arg[3]) && isAlphabet(arg[4]))
     {
-        int device = std::stoi(arg[1]);
-        int ch0 = std::stoi(arg[2]) - 1;
+        device = std::stoi(arg[1]);
+        channel = std::stoi(arg[2]) - 1;
         int byte0 = h.commandNumber(toLower(arg[3]));
         int byte1 = h.ccCommandNumber(toLower(arg[4]));
         int byte2 = getNumber(arg[5], 0);
@@ -80,23 +104,29 @@ P ArgParser::parse(std::vector<std::string>arg)
             return P::E_CCNAME_ERROR;
         }
 
-        //sendMessage(device, ch0, byte0 + ch0, byte1, byte2);
+        setBytes({ byte0 + channel, byte1, byte2 });
 
         return P::DEV_CH_CC_CCNAME;
     }
 
     ////// (4) mider device byte0 byte1 byte2 ////////
-    else if (isInt128(arg[1]) && isInt256(arg[2]) && isInt256(arg[3]) && isInt256(arg[4]))
+    else if (isInt128(arg[1]) && isInt256(arg[2]))
     {
-        int device = std::stoi(arg[1]);
-        int ch0 = getNumber(arg[2]) & 0x0F;
-        int byte0 = getNumber(arg[2]);
-        int byte1 = getNumber(arg[3]);
-        int byte2 = getNumber(arg[4]);
+        device = std::stoi(arg[1]);
+        channel = getNumber(arg[2]) & 0x0F;
 
-        //sendMessage(device, ch0, byte0 + ch0, byte1, byte2);
+        std::vector<int> bytelist;
+        for (int i = 2; i < arg.size(); i++)
+        {
+            int n = getNumber(arg[i], -1);
+            if (n < 0) {
+                break;
+            }
+            bytelist.push_back(n);
+        }
+        setBytes(bytelist);
 
-        return P::DEV_CH_BYTE0_BYTE1_BYTE2;
+        return P::DEV_BYTELIST;
     }
 
     ////// (5) mider help ////////
@@ -123,24 +153,31 @@ P ArgParser::parse(std::vector<std::string>arg)
         else if (isAlphabet(arg[2]) && isAlphabet(arg[3]))
         {
             int n = h.commandNumber(toLower(arg[2]));
-            if (h.commandName(n) != "Control Change")
+            if (h.commandName(n) == "Control Change")
             {
-                // TODO:エラーメッセージ見直し
-                message = arg[2] + " is not a message.";
-                return P::E_SYNTAX_ERROR;
+                int m = h.ccCommandNumber(toLower(arg[3]));
+                if (m < 0)
+                {
+                    message = arg[3] + " is not a control change.";
+                    return P::E_CCNAME_ERROR;
+                }
+                else if ((m < 120))
+                {
+                    message = "Control Change Help:\n";
+                    message += "  B0h Control Change | " + h.ccCommandHelp1(m);
+                    return P::HELP_CC_CCNAME;
+                }
+                else
+                {
+                    message = "Channel Mode Message Help:\n";
+                    message += "  B0h Channel Mode | " + h.ccCommandHelp1(m);
+                    return P::HELP_CM_CMNAME;
+                }
             }
 
-            int m = h.ccCommandNumber(toLower(arg[3]));
-            if (m < 0)
-            {
-                message = arg[3] + " is not a control change.";
-                return P::E_CCNAME_ERROR;
-            }
-
-            message = "Control Change Help:\n";
-            message += "  B0h Control Change | " + h.ccCommandHelp1(m);
-
-            return P::HELP_CC_CCNAME;
+            // TODO:エラーメッセージ見直し
+            message = arg[2] + " is not a message.";
+            return P::E_SYNTAX_ERROR;
         }
 
         // ここにはこないはず
@@ -154,12 +191,12 @@ P ArgParser::parse(std::vector<std::string>arg)
 
 int ArgParser::getDevice(void)
 {
-    return 0;
+    return device;
 }
 
 int ArgParser::getChannel(void)
 {
-    return 0;
+    return channel;
 }
 
 std::string ArgParser::getMessage(void)
@@ -167,9 +204,9 @@ std::string ArgParser::getMessage(void)
     return message;
 }
 
-std::vector<int> ArgParser::getBytes(void)
+std::vector<uint8_t> ArgParser::getBytes(void)
 {
-    return std::vector<int>();
+    return bytes;
 }
 
 std::string ArgParser::toLower(std::string s)
@@ -182,6 +219,7 @@ std::string ArgParser::toLower(std::string s)
 
     return s2;
 }
+
 
 bool ArgParser::isAlphabet(std::string s)
 {

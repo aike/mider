@@ -21,6 +21,7 @@ void usage(void);
 void listDevices(void);
 //std::string toLower(std::string s);
 void sendMessage(int device, int channel, int byte0, int byte1, int byte2);
+void sendMessage(int device, std::vector<uint8_t>bytelist);
 
 //bool isAlphabet(std::string s);
 //bool isInt1to16(std::string s);
@@ -44,14 +45,16 @@ int main (int argc, char* argv[])
 
     std::vector<std::string> args(argv, argv + argc);
 
-    switch (parser.parse(args))
+    P state = parser.parse(args);
+    switch (state)
     {
     case P::DEVICE:
         listDevices();
         break;
+
     case P::DEV_CH_MSGNAME:
     case P::DEV_CH_CC_CCNAME:
-    case P::DEV_CH_BYTE0_BYTE1_BYTE2:
+    case P::DEV_BYTELIST:
         b = parser.getBytes();
         sendMessage(parser.getDevice(), parser.getChannel(), b[0], b[1], b[2]);
         break;
@@ -67,12 +70,11 @@ int main (int argc, char* argv[])
         break;
 
     case P::E_SYNTAX_ERROR:
-        break;
     case P::E_MSGNAME_ERROR:
-        break;
     case P::E_CCNAME_ERROR:
-        break;
     case P::E_ARG_ERROR:
+        std::cerr << parser.getMessage();
+        return state - P::ERROR;
         break;
     default:
         break;
@@ -299,6 +301,43 @@ void listDevices(void)
 //
 //    return s2;
 //}
+
+void sendMessage(int device, std::vector<uint8_t>bytelist)
+{
+    auto midiOutputDevices = juce::MidiOutput::getAvailableDevices();
+
+    // check device
+    if (midiOutputDevices.isEmpty())
+    {
+        std::cerr << "ERROR: No MIDI output devices found." << std::endl;
+        exit(P::E_MIDI_DEVICE_ERROR - P::ERROR);
+    }
+
+    // select device
+    auto deviceInfo = midiOutputDevices[device - 1];
+    auto midiOutput = juce::MidiOutput::openDevice(deviceInfo.identifier);
+    if (midiOutput == nullptr)
+    {
+        std::cerr << "ERROR: Failed to open MIDI output device." << std::endl;
+        exit(P::E_MIDI_DEVICE_ERROR - P::ERROR);
+    }
+
+    // show dump
+    std::cout << std::endl;
+    std::cout << "  device : " << device << " \"" << deviceInfo.name << "\"" << std::endl;
+    std::cout << "  channel: " << (parser.getChannel() + 1) << std::endl;
+    //std::cout << "  bytes  : " << hex0.str() << " " << hex1.str() << " " << hex2.str();
+    //std::cout << " (" << byte0 << " " << byte1 << " " << byte2 << ")" << std::endl;
+    //std::cout << std::endl;
+    //std::cout << "  " << h.toString(byte0 & 0xF0, byte1, byte2) << std::endl;
+    //std::cout << std::endl;
+
+    // send message
+    //auto msg = juce::MidiMessage(parser.getBytes());
+    //midiOutput->sendMessageNow(msg);
+
+}
+
 
 void sendMessage(int device, int channel, int byte0, int byte1, int byte2)
 {

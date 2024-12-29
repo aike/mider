@@ -128,6 +128,24 @@ std::string Help::toString(int b0, int b1, int b2)
     return s;
 }
 
+int Help::getMessageLength(int n)
+{
+    int ret = 1;
+
+    if (byte1[n] == "-")
+    {
+        return ret;
+    }
+    ret++;
+
+    if (byte2[n] == "-")
+    {
+        return ret;
+    }
+    ret++;
+
+    return ret;
+}
 
 // 大文字→小文字変換＋スペース除外
 std::string Help::toLowerNoSpace(const std::string& in_s)
