@@ -20,7 +20,7 @@ P ArgParser::parse(std::vector<std::string>arg)
 {
     // clear parse result
     bytes.clear();
-    message = "";
+    text = "";
 
     // convert from char* array to std::string array
     while (arg.size() < 10)
@@ -34,11 +34,20 @@ P ArgParser::parse(std::vector<std::string>arg)
         return P::NO_ARGS_HELP;
     }
 
-    ////// (1) mider devices ////////
+    ////// (1) mider command ////////
     else if ((arg[1] == "devices") && (arg[2] == ""))
     {
         return P::DEVICE;
     }
+    else if ((arg[1] == "indevices") && (arg[2] == ""))
+    {
+        return P::INDEVICE;
+    }
+    else if ((arg[1] == "outdevices") && (arg[2] == ""))
+    {
+        return P::OUTDEVICE;
+    }
+
 
     ////// (2) mider device channel command byte1 byte2 ////////
     else if (isInt128(arg[1]) && isInt1to16(arg[2]) && isAlphabet(arg[3]) && !isAlphabet(arg[4]))
@@ -48,7 +57,7 @@ P ArgParser::parse(std::vector<std::string>arg)
         int byte0 = h.commandNumber(toLower(arg[3]));
         if (byte0 < 0)
         {
-            message = "ERROR: Massage name(" + arg[3] + ") not found.";
+            text = "ERROR: Massage name(" + arg[3] + ") not found.";
             return P::E_MSGNAME_ERROR;
         }
 
@@ -62,8 +71,8 @@ P ArgParser::parse(std::vector<std::string>arg)
             int byte1 = getNumber(arg[4]);
             if (byte1 < 0)
             {
-                message = "ERROR: Argument syntax error.\n";
-                message += "  " + h.commandHelp1(byte0);
+                text = "ERROR: Argument syntax error.\n";
+                text += "  " + h.commandHelp1(byte0);
                 return P::E_SYNTAX_ERROR;
             }
             setBytes({ byte0 + channel, byte1 });
@@ -74,8 +83,8 @@ P ArgParser::parse(std::vector<std::string>arg)
             int byte2 = getNumber(arg[5]);
             if ((byte1 < 0) || (byte2 < 0))
             {
-                message = "ERROR: Argument syntax error.\n";
-                message += "  " + h.commandHelp1(byte0);
+                text = "ERROR: Argument syntax error.\n";
+                text += "  " + h.commandHelp1(byte0);
                 return P::E_SYNTAX_ERROR;
             }
             setBytes({ byte0 + channel, byte1, byte2 });
@@ -95,12 +104,12 @@ P ArgParser::parse(std::vector<std::string>arg)
 
         if (byte0 != 0xB0)
         {
-            message = "ERROR: Argument syntax error.";
+            text = "ERROR: Argument syntax error.";
             return P::E_SYNTAX_ERROR;
         }
         if (byte1 < 0)
         {
-            message = "ERROR: CC name(" + arg[4] + ") not found.";
+            text = "ERROR: CC name(" + arg[4] + ") not found.";
             return P::E_CCNAME_ERROR;
         }
 
@@ -129,7 +138,14 @@ P ArgParser::parse(std::vector<std::string>arg)
         return P::DEV_BYTELIST;
     }
 
-    ////// (5) mider help ////////
+    ////// (5) mider device receive ////////
+    else if (isInt128(arg[1]) && (arg[2] == "receive") && (arg[3] == ""))
+    {
+        device = std::stoi(arg[1]);
+        return P::DEV_RECEIVE;
+    }
+
+    ////// (6) mider help ////////
     else if (arg[1] == "help")
     {
         if (arg[2] == "")
@@ -141,7 +157,7 @@ P ArgParser::parse(std::vector<std::string>arg)
             int n = h.commandNumber(toLower(arg[2]));
             if (n < 0)
             {
-                message = arg[2] + " is not a message.";
+                text = arg[2] + " is not a message.";
                 return P::E_MSGNAME_ERROR;
             }
             else if (h.commandName(n) == "Control Change")
@@ -158,25 +174,25 @@ P ArgParser::parse(std::vector<std::string>arg)
                 int m = h.ccCommandNumber(toLower(arg[3]));
                 if (m < 0)
                 {
-                    message = arg[3] + " is not a control change.";
+                    text = arg[3] + " is not a control change.";
                     return P::E_CCNAME_ERROR;
                 }
                 else if ((m < 120))
                 {
-                    message = "Control Change Help:\n";
-                    message += "  B0h Control Change | " + h.ccCommandHelp1(m);
+                    text = "Control Change Help:\n";
+                    text += "  B0h Control Change | " + h.ccCommandHelp1(m);
                     return P::HELP_CC_CCNAME;
                 }
                 else
                 {
-                    message = "Channel Mode Message Help:\n";
-                    message += "  B0h Channel Mode | " + h.ccCommandHelp1(m);
+                    text = "Channel Mode Message Help:\n";
+                    text += "  B0h Channel Mode | " + h.ccCommandHelp1(m);
                     return P::HELP_CM_CMNAME;
                 }
             }
 
             // TODO:エラーメッセージ見直し
-            message = arg[2] + " is not a message.";
+            text = arg[2] + " is not a message.";
             return P::E_SYNTAX_ERROR;
         }
 
@@ -185,7 +201,7 @@ P ArgParser::parse(std::vector<std::string>arg)
     }
 
     ////// the other argument pattern /////////
-    message = "ERROR: Argument syntax error.";
+    text = "ERROR: Argument syntax error.";
     return P::E_ARG_ERROR;
 }
 
@@ -199,9 +215,9 @@ int ArgParser::getChannel(void)
     return channel;
 }
 
-std::string ArgParser::getMessage(void)
+std::string ArgParser::getText(void)
 {
-    return message;
+    return text;
 }
 
 std::vector<uint8_t> ArgParser::getBytes(void)

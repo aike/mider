@@ -5,6 +5,9 @@
               companyWebsite="https://github.com/aike">
   <MAINGROUP id="qSDJrU" name="mider">
     <GROUP id="{E2E60F9A-B0B1-FBD4-1B72-6FE15172E7CE}" name="Source">
+      <FILE id="cPezOu" name="MidiReceiver.cpp" compile="1" resource="0"
+            file="Source/MidiReceiver.cpp"/>
+      <FILE id="Go7P6e" name="MidiReceiver.h" compile="0" resource="0" file="Source/MidiReceiver.h"/>
       <FILE id="XOC1M3" name="Test.h" compile="0" resource="0" file="Source/Test.h"/>
       <FILE id="BGjd22" name="ArgParser.h" compile="0" resource="0" file="Source/ArgParser.h"/>
       <FILE id="W1qjp9" name="ArgParser.cpp" compile="1" resource="0" file="Source/ArgParser.cpp"/>

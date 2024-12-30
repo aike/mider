@@ -22,6 +22,9 @@ int main()
     shouldBe({ "mider" }, P::NO_ARGS_HELP);
 
     shouldBe({ "mider", "devices" }, P::DEVICE);
+    shouldBe({ "mider", "indevices" }, P::INDEVICE);
+    shouldBe({ "mider", "outdevices" }, P::OUTDEVICE);
+    shouldBe({ "mider", "receive" }, P::RECEIVE);
 
     // Message Test
     shouldBe({ "mider", "1", "1", "NoteOn", "60", "100"}, P::DEV_CH_MSGNAME);

@@ -16,10 +16,13 @@
 
 enum P {
     DEVICE,
+    INDEVICE,
+    OUTDEVICE,
     DEV_CH_MSGNAME,
     DEV_CH_CC_CCNAME,
     DEV_CH_CM_CMNAME,
     DEV_BYTELIST,
+    DEV_RECEIVE,
 
     NO_ARGS_HELP,
     HELP,
@@ -48,7 +51,7 @@ public:
     int getDevice(void);
     int getChannel(void);
     std::vector<uint8_t>getBytes(void);
-    std::string getMessage(void);
+    std::string getText(void);
 
 private:
 
@@ -66,8 +69,8 @@ private:
     };
 
     Help h;
-    int device;
-    int channel;
+    int device = 0;
+    int channel = 0;
     std::vector<uint8_t> bytes;
-    std::string message;
+    std::string text;
 };

@@ -12,16 +12,22 @@
 #include <algorithm>
 #include <sstream>
 #include <vector>
+#include <csignal>
 
 
 #include "Help.h"
 #include "ArgParser.h"
+#include "MidiReceiver.h"
 
 void usage(void);
-void listDevices(void);
+void listInDevices(void);
+void listOutDevices(void);
+void listAllDevices(void);
 //std::string toLower(std::string s);
 void sendMessage(int device, int channel, int byte0, int byte1, int byte2);
 void sendMessage(int device, std::vector<uint8_t>bytelist);
+
+void receiveMessage(int device);
 
 //bool isAlphabet(std::string s);
 //bool isInt1to16(std::string s);
@@ -31,17 +37,28 @@ void sendMessage(int device, std::vector<uint8_t>bytelist);
 
 Help h;
 ArgParser parser;
+MidiReceiver receiver;
 
-#define TEST
+//#define TEST
 
 #include "Test.h"
+
+
+// Ctrl+Cを検知したときにtrueにするフラグ
+volatile std::sig_atomic_t keepRunning = 1;
+
+// Ctrl+Cのハンドラ
+void signalHandler(int)
+{
+    keepRunning = 0;
+}
 
 
 //==============================================================================
 #ifndef TEST
 int main (int argc, char* argv[])
 {
-    std::vector<int>b;
+    std::vector<uint8_t>b;
 
     std::vector<std::string> args(argv, argv + argc);
 
@@ -49,7 +66,13 @@ int main (int argc, char* argv[])
     switch (state)
     {
     case P::DEVICE:
-        listDevices();
+        listAllDevices();
+        break;
+    case P::INDEVICE:
+        listInDevices();
+        break;
+    case P::OUTDEVICE:
+        listOutDevices();
         break;
 
     case P::DEV_CH_MSGNAME:
@@ -59,6 +82,10 @@ int main (int argc, char* argv[])
         sendMessage(parser.getDevice(), parser.getChannel(), b[0], b[1], b[2]);
         break;
  
+    case P::DEV_RECEIVE:
+        receiveMessage(parser.getDevice());
+        break;
+
     case P::NO_ARGS_HELP:
         usage();
         break;
@@ -73,43 +100,14 @@ int main (int argc, char* argv[])
     case P::E_MSGNAME_ERROR:
     case P::E_CCNAME_ERROR:
     case P::E_ARG_ERROR:
-        std::cerr << parser.getMessage();
+        std::cerr << parser.getText();
         return state - P::ERROR;
         break;
     default:
         break;
     }
 
-    // convert from char* array to std::string array
 
-    //std::string arg[10];
-    //if (argc > 10)
-    //{
-    //    argc = 10;
-    //}
-    //for (int i = 0; i < argc; i++)
-    //{
-    //    arg[i] = argv[i];
-    //}
-    //for (int i = argc; i < 10; i++)
-    //{
-    //    arg[i] = "";
-    //}
-
-
-    ////// (0) mider ////////
-    //if (arg[1] == "")
-    //{
-    //    usage();
-    //    return 1;
-    //}
-
-    ////// (1) mider devices ////////
-    //else if ((arg[1] == "devices") && (arg[2] == ""))
-    //{
-    //    listDevices();
-    //    return 0;
-    //}
 
     ////// (2) mider device channel command byte1 byte2 ////////
     //else if (isInt128(arg[1]) && isInt1to16(arg[2]) && isAlphabet(arg[3]) && !isAlphabet(arg[4]))
@@ -276,12 +274,12 @@ void usage(void)
     std::cout << std::endl;
 }
 
-void listDevices(void)
+void listInDevices(void)
 {
     // List Output Devices
-    auto midiOutputDevices = juce::MidiOutput::getAvailableDevices();
+    auto midiOutputDevices = juce::MidiInput::getAvailableDevices();
     std::cout << std::endl;
-    std::cout << "MIDI Devices:" << std::endl;
+    std::cout << "MIDI Input Devices:" << std::endl;
     for (int i = 0; i < midiOutputDevices.size(); i++)
     {
         const auto& device = midiOutputDevices[i];
@@ -290,17 +288,28 @@ void listDevices(void)
     std::cout << std::endl;
 }
 
-//
-//std::string toLower(std::string s)
-//{
-//    std::string s2 = s;
-//
-//    for (int i = 0; i < s.size(); i++) {
-//        s2[i] = static_cast<char>(std::tolower(s2[i]));
-//    }
-//
-//    return s2;
-//}
+void listOutDevices(void)
+{
+    // List Output Devices
+    auto midiOutputDevices = juce::MidiOutput::getAvailableDevices();
+    std::cout << std::endl;
+    std::cout << "MIDI Output Devices:" << std::endl;
+    for (int i = 0; i < midiOutputDevices.size(); i++)
+    {
+        const auto& device = midiOutputDevices[i];
+        std::cout << "  " << (i + 1) << " " << device.name.toRawUTF8() << std::endl;
+    }
+    std::cout << std::endl;
+}
+
+void listAllDevices(void)
+{
+    listInDevices();
+    listOutDevices();
+}
+
+
+
 
 void sendMessage(int device, std::vector<uint8_t>bytelist)
 {
@@ -326,7 +335,10 @@ void sendMessage(int device, std::vector<uint8_t>bytelist)
     std::cout << std::endl;
     std::cout << "  device : " << device << " \"" << deviceInfo.name << "\"" << std::endl;
     std::cout << "  channel: " << (parser.getChannel() + 1) << std::endl;
-    //std::cout << "  bytes  : " << hex0.str() << " " << hex1.str() << " " << hex2.str();
+
+    //std::cout << message.
+
+        //std::cout << "  bytes  : " << hex0.str() << " " << hex1.str() << " " << hex2.str();
     //std::cout << " (" << byte0 << " " << byte1 << " " << byte2 << ")" << std::endl;
     //std::cout << std::endl;
     //std::cout << "  " << h.toString(byte0 & 0xF0, byte1, byte2) << std::endl;
@@ -375,75 +387,30 @@ void sendMessage(int device, int channel, int byte0, int byte1, int byte2)
 
     // send message
     auto msg = juce::MidiMessage(byte0, byte1, byte2);
+
+    // std::cout << msg.getDescription() << std::endl;
+
     midiOutput->sendMessageNow(msg);
 }
-//
-//
-//bool isAlphabet(std::string s)
-//{
-//    std::regex re_command(R"(^[a-zA-Z][a-zA-Z0-9]*$)");
-//    std::smatch match;
-//
-//    if (std::regex_match(s, match, re_command))
-//    {
-//        return true;
-//    }
-//    return false;
-//}
-//
-//bool isInt1to16(std::string s)
-//{
-//    int n = getNumber(s);
-//    if ((n < 1) || (n > 16))
-//    {
-//        return false;
-//    }
-//    return true;
-//}
-//
-//bool isInt128(std::string s)
-//{
-//    int n = getNumber(s);
-//    if ((n < 0) || (n > 127))
-//    {
-//        return false;
-//    }
-//    return true;
-//}
-//
-//bool isInt256(std::string s)
-//{
-//    int n = getNumber(s);
-//    if ((n < 0) || (n > 255))
-//    {
-//        return false;
-//    }
-//    return true;
-//}
-//
-//int getNumber(std::string s, int defval)
-//{
-//    std::regex re_dec(R"(^\d?\d?\d$)");
-//    std::regex re_hex1(R"(^[0-9a-fA-F]?[0-9a-fA-F]h$)");
-//    std::regex re_hex2(R"(^0x[0-9a-fA-F]?[0-9a-fA-F]$)");
-//    std::smatch match;
-//    int value = defval;
-//
-//    if (std::regex_match(s, match, re_dec))
-//    {
-//        value = std::stoi(match[0].str());
-//    }
-//    else if (std::regex_match(s, match, re_hex1))
-//    {
-//        s.pop_back();
-//        value = std::stoi(match[0].str(), nullptr, 16);
-//    }
-//    else if (std::regex_match(s, match, re_hex2))
-//    {
-//        s.erase(0, 2);
-//        value = std::stoi(match[0].str(), nullptr, 16);
-//    }
-//
-//    return value;
-//}
-//
+
+
+void receiveMessage(int device)
+{
+    // Ctrl+C シグナルハンドラを登録
+    std::signal(SIGINT, signalHandler);
+
+    std::cout << "Starting MIDI Receiver..." << std::endl;
+    receiver.start(device);
+    std::cout << "Press Ctrl+C to exit." << std::endl;
+
+    // Ctrl+Cが押されるまで待機
+    while (keepRunning)
+    {
+        juce::Thread::sleep(100); // 少し待機してCPU負荷を軽減
+    }
+
+    std::cout << "Exiting MIDI Receiver." << std::endl;
+
+    exit(0);
+}
+
