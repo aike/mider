@@ -23,17 +23,10 @@ void usage(void);
 void listInDevices(void);
 void listOutDevices(void);
 void listAllDevices(void);
-//std::string toLower(std::string s);
 void sendMessage(int device, int channel, int byte0, int byte1, int byte2);
 void sendMessage(int device, std::vector<uint8_t>bytelist);
-
 void receiveMessage(int device);
 
-//bool isAlphabet(std::string s);
-//bool isInt1to16(std::string s);
-//bool isInt128(std::string s);
-//bool isInt256(std::string s);
-//int getNumber(std::string s, int defval = -1);
 
 Help h;
 ArgParser parser;
@@ -67,12 +60,15 @@ int main (int argc, char* argv[])
     {
     case P::DEVICE:
         listAllDevices();
+        std::cout << std::endl;
         break;
     case P::INDEVICE:
         listInDevices();
+        std::cout << std::endl;
         break;
     case P::OUTDEVICE:
         listOutDevices();
+        std::cout << std::endl;
         break;
 
     case P::DEV_CH_MSGNAME:
@@ -285,7 +281,6 @@ void listInDevices(void)
         const auto& device = midiOutputDevices[i];
         std::cout << "  " << (i + 1) << " " << device.name.toRawUTF8() << std::endl;
     }
-    std::cout << std::endl;
 }
 
 void listOutDevices(void)
@@ -299,7 +294,6 @@ void listOutDevices(void)
         const auto& device = midiOutputDevices[i];
         std::cout << "  " << (i + 1) << " " << device.name.toRawUTF8() << std::endl;
     }
-    std::cout << std::endl;
 }
 
 void listAllDevices(void)
