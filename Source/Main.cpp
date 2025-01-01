@@ -393,9 +393,9 @@ void receiveMessage(int device)
     // Ctrl+C シグナルハンドラを登録
     std::signal(SIGINT, signalHandler);
 
-    std::cout << "Starting MIDI Receiver..." << std::endl;
+    //std::cout << "Starting MIDI Receiver..." << std::endl;
     receiver.start(device);
-    std::cout << "Press Ctrl+C to exit." << std::endl;
+    //std::cout << "Press Ctrl+C to exit." << std::endl;
 
     // Ctrl+Cが押されるまで待機
     while (keepRunning)

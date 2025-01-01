@@ -11,6 +11,8 @@
 #include <cctype>
 #include <iomanip>
 #include <sstream>
+#include <iostream>
+#include <vector>
 
 #include "Help.h"
 
@@ -127,6 +129,39 @@ std::string Help::toString(int b0, int b1, int b2)
     }
     return s;
 }
+
+std::string Help::toString(std::vector<int> byte)
+{
+    std::string s = "";
+    int msgtype = byte[0] & 0xF0;
+    int len = getMessageLength(msgtype);
+
+    if (byte.size() >= len)
+    {
+        if (commandName(msgtype) == "Control Change")
+        {
+            int cctype = byte[1];
+            s = "[CC] [" + cc1[cctype] + "] [" + cc2[cctype] + ":" + std::to_string(byte[1]) + "]";
+            return s;
+        }
+
+        switch (len) {
+        case 1:
+            s = "[" + byte0[msgtype] + "]";
+            break;
+        case 2:
+            s = "[" + byte0[msgtype] + "] [" + byte1[msgtype] + ":" + std::to_string(byte[1]) + "]";
+            break;
+        case 3:
+            s = "[" + byte0[msgtype] + "] [" + byte1[msgtype] + ":" + std::to_string(byte[1]) + "] [" + byte2[msgtype] + ":" + std::to_string(byte[2]) + "]";
+            break;
+        default:
+            break;
+        }
+    }
+    return s;
+}
+
 
 int Help::getMessageLength(int n)
 {

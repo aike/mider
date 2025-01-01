@@ -11,6 +11,8 @@
 #pragma once
 
 #include <JuceHeader.h>
+#include <string>
+#include "Help.h"
 
 class MidiReceiver : public juce::MidiInputCallback
 {
@@ -22,4 +24,7 @@ public:
 
 private:
     std::unique_ptr<juce::MidiInput> midiInput;
+    int deviceno = 0;
+    std::string devicename = "";
+    Help h;
 };

@@ -201,6 +201,7 @@ public:
     int ccCommandNumber(std::string s);
     std::string ccName(int n);
     std::string toString(int byte0, int byte1, int byte2);
+    std::string toString(std::vector<int> byte);
     int getMessageLength(int n);
 
 private:
