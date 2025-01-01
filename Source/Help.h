@@ -10,7 +10,17 @@
 #pragma once
 
 #include <string>
+#include <vector>
 #include <map>
+
+enum MSG {
+    ChannelVoice,
+    ChannelVoiceCc,
+    ChannelMode,
+    SystemCommon,
+    SystemRealtime,
+    NotStatus
+};
 
 class Help
 {
@@ -200,8 +210,9 @@ public:
     std::string ccCommandHelp1(int n);
     int ccCommandNumber(std::string s);
     std::string ccName(int n);
-    std::string toString(int byte0, int byte1, int byte2);
-    std::string toString(std::vector<int> byte);
+    //std::string toString(int byte0, int byte1, int byte2);
+    std::string toString(std::vector<uint8_t> byte);
+    MSG getMessageType(std::vector<uint8_t> byte);
     int getMessageLength(int n);
 
 private:

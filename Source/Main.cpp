@@ -23,8 +23,8 @@ void usage(void);
 void listInDevices(void);
 void listOutDevices(void);
 void listAllDevices(void);
-void sendMessage(int device, int channel, int byte0, int byte1, int byte2);
-void sendMessage(int device, std::vector<uint8_t>bytelist);
+//void sendMessage(int device, int channel, int byte0, int byte1, int byte2);
+void sendMessage(int device, std::vector<uint8_t>data);
 void receiveMessage(int device);
 
 
@@ -32,7 +32,7 @@ Help h;
 ArgParser parser;
 MidiReceiver receiver;
 
-//#define TEST
+#define TEST
 
 #include "Test.h"
 
@@ -52,7 +52,6 @@ void signalHandler(int)
 int main (int argc, char* argv[])
 {
     std::vector<uint8_t>b;
-
     std::vector<std::string> args(argv, argv + argc);
 
     P state = parser.parse(args);
@@ -71,11 +70,13 @@ int main (int argc, char* argv[])
         std::cout << std::endl;
         break;
 
-    case P::DEV_CH_MSGNAME:
-    case P::DEV_CH_CC_CCNAME:
+    case P::DEV_CH_CHANNELVOICEMSG:
+    case P::DEV_CH_CC_CHANNELVOICEMSG:
+    case P::DEV_SYSTEMCOMMONMSG:
+    case P::DEV_SYSTEMRTMSG:
     case P::DEV_BYTELIST:
         b = parser.getBytes();
-        sendMessage(parser.getDevice(), parser.getChannel(), b[0], b[1], b[2]);
+        sendMessage(parser.getDevice(), b);
         break;
  
     case P::DEV_RECEIVE:
@@ -305,7 +306,7 @@ void listAllDevices(void)
 
 
 
-void sendMessage(int device, std::vector<uint8_t>bytelist)
+void sendMessage(int device, std::vector<uint8_t>data)
 {
     auto midiOutputDevices = juce::MidiOutput::getAvailableDevices();
 
@@ -325,18 +326,29 @@ void sendMessage(int device, std::vector<uint8_t>bytelist)
         exit(P::E_MIDI_DEVICE_ERROR - P::ERROR);
     }
 
+
+    int ch = (int)data[0] & 0x0F;
+
+    std::stringstream dec;
+    std::stringstream hex;
+    for (int i = 0; i < data.size(); i++)
+    {
+        dec << std::to_string(data[i]);
+        hex << std::setfill('0') << std::setw(2) << std::hex << std::uppercase << (int)data[i] << "h";
+        if (i < data.size() - 1)
+        {
+            dec << " ";
+            hex << " ";
+        }
+    }
+
     // show dump
     std::cout << std::endl;
     std::cout << "  device : " << device << " \"" << deviceInfo.name << "\"" << std::endl;
-    std::cout << "  channel: " << (parser.getChannel() + 1) << std::endl;
-
-    //std::cout << message.
-
-        //std::cout << "  bytes  : " << hex0.str() << " " << hex1.str() << " " << hex2.str();
-    //std::cout << " (" << byte0 << " " << byte1 << " " << byte2 << ")" << std::endl;
-    //std::cout << std::endl;
-    //std::cout << "  " << h.toString(byte0 & 0xF0, byte1, byte2) << std::endl;
-    //std::cout << std::endl;
+    std::cout << "  channel: " << (ch + 1) << std::endl;
+    std::cout << "  bytes  : " << hex.str() << " (" << dec.str() << ")" << std::endl;
+    std::cout << "  message: " << h.toString(data) << std::endl;
+    std::cout << std::endl;
 
     // send message
     //auto msg = juce::MidiMessage(parser.getBytes());
@@ -344,7 +356,7 @@ void sendMessage(int device, std::vector<uint8_t>bytelist)
 
 }
 
-
+/*
 void sendMessage(int device, int channel, int byte0, int byte1, int byte2)
 {
     auto midiOutputDevices = juce::MidiOutput::getAvailableDevices();
@@ -364,6 +376,7 @@ void sendMessage(int device, int channel, int byte0, int byte1, int byte2)
         std::cerr << "ERROR: Failed to open MIDI output device." << std::endl;
         exit(2);
     }
+
 
     // show dump
     std::stringstream hex0, hex1, hex2;
@@ -386,7 +399,7 @@ void sendMessage(int device, int channel, int byte0, int byte1, int byte2)
 
     midiOutput->sendMessageNow(msg);
 }
-
+*/
 
 void receiveMessage(int device)
 {

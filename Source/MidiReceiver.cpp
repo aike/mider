@@ -30,17 +30,10 @@ void MidiReceiver::handleIncomingMidiMessage(juce::MidiInput*, const juce::MidiM
 
     const uint8_t* u8data = message.getRawData();
     int size = message.getRawDataSize();
-
-    // uint8_t 配列を std::vector<int> に変換
-    std::vector<int> data;
-    data.reserve(size); // 必要な容量を確保
-    for (size_t i = 0; i < size; ++i)
-    {
-        data.push_back(static_cast<int>(u8data[i]));
-    }
+    // uint8_t[] を std::vector<uint8_t> に変換
+    std::vector<uint8_t> data(u8data, u8data + size);
 
     int ch = data[0] & 0x0F;
-
     std::stringstream dec;
     std::stringstream hex;
     for (int i = 0; i < size; i++)

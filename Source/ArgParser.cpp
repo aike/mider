@@ -48,8 +48,15 @@ P ArgParser::parse(std::vector<std::string>arg)
         return P::OUTDEVICE;
     }
 
+    ////// (5) mider device receive ////////
+    else if (isInt128(arg[1]) && (arg[2] == "receive") && (arg[3] == ""))
+    {
+        device = std::stoi(arg[1]);
+        return P::DEV_RECEIVE;
+    }
 
     ////// (2) mider device channel command byte1 byte2 ////////
+    // TODO: â¬ïœí∑à¯êî
     else if (isInt128(arg[1]) && isInt1to16(arg[2]) && isAlphabet(arg[3]) && !isAlphabet(arg[4]))
     {
         device = std::stoi(arg[1]);
@@ -90,7 +97,56 @@ P ArgParser::parse(std::vector<std::string>arg)
             setBytes({ byte0 + channel, byte1, byte2 });
         }
 
-        return P::DEV_CH_MSGNAME;
+        return P::DEV_CH_CHANNELVOICEMSG;
+    }
+
+    ////// (2) mider device command [byte1 [byte2]] ////////
+    else if (isInt128(arg[1]) && isAlphabet(arg[2]) && !isAlphabet(arg[3]))
+    {
+        device = std::stoi(arg[1]);
+        channel = -1;
+        int byte0 = h.commandNumber(toLower(arg[2]));
+        if (byte0 < 0)
+        {
+            text = "ERROR: Massage name(" + arg[2] + ") not found.";
+            return P::E_MSGNAME_ERROR;
+        }
+
+        int len = h.getMessageLength(byte0);
+        if (len == 1)
+        {
+            setBytes({ byte0 + channel });
+        }
+        else if (len == 2)
+        {
+            int byte1 = getNumber(arg[3]);
+            if (byte1 < 0)
+            {
+                text = "ERROR: Argument syntax error.\n";
+                text += "  " + h.commandHelp1(byte0);
+                return P::E_SYNTAX_ERROR;
+            }
+            setBytes({ byte0, byte1 });
+        }
+        else if (len == 3)
+        {
+            int byte1 = getNumber(arg[3]);
+            int byte2 = getNumber(arg[4]);
+            if ((byte1 < 0) || (byte2 < 0))
+            {
+                text = "ERROR: Argument syntax error.\n";
+                text += "  " + h.commandHelp1(byte0);
+                return P::E_SYNTAX_ERROR;
+            }
+            setBytes({ byte0, byte1, byte2 });
+        }
+
+        if (h.getMessageType(getBytes()) == MSG::SystemCommon)
+        {
+            return P::DEV_SYSTEMCOMMONMSG;
+        }
+
+        return P::DEV_SYSTEMRTMSG;
     }
 
     ////// (3) mider device channel "cc" cc_command byte2 ////////
@@ -115,7 +171,7 @@ P ArgParser::parse(std::vector<std::string>arg)
 
         setBytes({ byte0 + channel, byte1, byte2 });
 
-        return P::DEV_CH_CC_CCNAME;
+        return P::DEV_CH_CC_CHANNELVOICEMSG;
     }
 
     ////// (4) mider device byte0 byte1 byte2 ////////
@@ -136,13 +192,6 @@ P ArgParser::parse(std::vector<std::string>arg)
         setBytes(bytelist);
 
         return P::DEV_BYTELIST;
-    }
-
-    ////// (5) mider device receive ////////
-    else if (isInt128(arg[1]) && (arg[2] == "receive") && (arg[3] == ""))
-    {
-        device = std::stoi(arg[1]);
-        return P::DEV_RECEIVE;
     }
 
     ////// (6) mider help ////////

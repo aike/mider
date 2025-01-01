@@ -115,6 +115,7 @@ std::string Help::ccName(int n)
     return "";
 }
 
+/*
 std::string Help::toString(int b0, int b1, int b2)
 {
     std::string s = "";
@@ -129,37 +130,78 @@ std::string Help::toString(int b0, int b1, int b2)
     }
     return s;
 }
+*/
 
-std::string Help::toString(std::vector<int> byte)
+std::string Help::toString(std::vector<uint8_t> byte)
 {
     std::string s = "";
-    int msgtype = byte[0] & 0xF0;
-    int len = getMessageLength(msgtype);
+    int msg = byte[0];
+    int len = getMessageLength(msg);
 
     if (byte.size() >= len)
     {
-        if (commandName(msgtype) == "Control Change")
+        MSG msgtype = getMessageType(byte);
+        if (msgtype == MSG::ChannelVoiceCc)
         {
             int cctype = byte[1];
-            s = "[CC] [" + cc1[cctype] + "] [" + cc2[cctype] + ":" + std::to_string(byte[1]) + "]";
+            s = "[Control Change] [" + cc1[cctype] + "] [" + cc2[cctype] + ":" + std::to_string(byte[1]) + "]";
             return s;
+        }
+        else if (msgtype == MSG::ChannelMode)
+        {
+            int cctype = byte[1];
+            s = "[Channel Mode] [" + cc1[cctype] + "] [" + cc2[cctype] + ":" + std::to_string(byte[1]) + "]";
+            return s;
+        }
+        else if (msgtype == MSG::ChannelVoice)
+        {
+            msg = msg & 0xF0;
         }
 
         switch (len) {
         case 1:
-            s = "[" + byte0[msgtype] + "]";
+            s = "[" + byte0[msg] + "]";
             break;
         case 2:
-            s = "[" + byte0[msgtype] + "] [" + byte1[msgtype] + ":" + std::to_string(byte[1]) + "]";
+            s = "[" + byte0[msg] + "] [" + byte1[msg] + ":" + std::to_string(byte[1]) + "]";
             break;
         case 3:
-            s = "[" + byte0[msgtype] + "] [" + byte1[msgtype] + ":" + std::to_string(byte[1]) + "] [" + byte2[msgtype] + ":" + std::to_string(byte[2]) + "]";
+            s = "[" + byte0[msg] + "] [" + byte1[msg] + ":" + std::to_string(byte[1]) + "] [" + byte2[msg] + ":" + std::to_string(byte[2]) + "]";
             break;
         default:
             break;
         }
     }
     return s;
+}
+
+MSG Help::getMessageType(std::vector<uint8_t> byte)
+{
+    if (byte[0] < 0x80)
+    {
+        return MSG::NotStatus;
+    }
+    else if (byte[0] < 0xF0)
+    {
+        if ((byte.size() > 2) && ((byte[0] & 0xF0) == 0xB0))
+        {
+            if (byte[1] < 0x78)
+            {
+                return MSG::ChannelVoiceCc; // B0 + ControlChange
+            }
+            else
+            {
+                return MSG::ChannelMode;    // B0 + NotControlChange
+            }
+        }
+        return MSG::ChannelVoice; // 0x80-0xE0
+    }
+    else if (byte[0] < 0xF8)
+    {
+        return MSG::SystemCommon;
+    }
+
+    return MSG::SystemRealtime;
 }
 
 

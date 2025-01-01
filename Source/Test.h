@@ -24,21 +24,25 @@ int main()
     shouldBe({ "mider", "devices" }, P::DEVICE);
     shouldBe({ "mider", "indevices" }, P::INDEVICE);
     shouldBe({ "mider", "outdevices" }, P::OUTDEVICE);
-    shouldBe({ "mider", "receive" }, P::RECEIVE);
+    shouldBe({ "mider", "1", "receive" }, P::DEV_RECEIVE);
 
     // Message Test
-    shouldBe({ "mider", "1", "1", "NoteOn", "60", "100"}, P::DEV_CH_MSGNAME);
-    shouldBe({ "mider", "1", "1", "noteon", "60", "100" }, P::DEV_CH_MSGNAME);
-    shouldBe({ "mider", "1", "1", "NOTEON", "60", "100" }, P::DEV_CH_MSGNAME);
-    shouldBe({ "mider", "1", "1", "no", "60", "100" }, P::DEV_CH_MSGNAME);
-    shouldBe({ "mider", "1", "1", "NO", "60", "100" }, P::DEV_CH_MSGNAME);
+    shouldBe({ "mider", "1", "1", "NoteOn", "60", "100"}, P::DEV_CH_CHANNELVOICEMSG);
+    shouldBe({ "mider", "1", "1", "noteon", "60", "100" }, P::DEV_CH_CHANNELVOICEMSG);
+    shouldBe({ "mider", "1", "1", "NOTEON", "60", "100" }, P::DEV_CH_CHANNELVOICEMSG);
+    shouldBe({ "mider", "1", "1", "no", "60", "100" }, P::DEV_CH_CHANNELVOICEMSG);
+    shouldBe({ "mider", "1", "1", "NO", "60", "100" }, P::DEV_CH_CHANNELVOICEMSG);
 
     // CC Test
-    shouldBe({ "mider", "1", "1", "CC", "BankSelect" }, P::DEV_CH_CC_CCNAME);
-    shouldBe({ "mider", "1", "1", "CC", "bankselect" }, P::DEV_CH_CC_CCNAME);
-    shouldBe({ "mider", "1", "1", "CC", "BANKSELECT" }, P::DEV_CH_CC_CCNAME);
-    shouldBe({ "mider", "1", "1", "CC", "bs" }, P::DEV_CH_CC_CCNAME);
-    shouldBe({ "mider", "1", "1", "CC", "BS" }, P::DEV_CH_CC_CCNAME);
+    shouldBe({ "mider", "1", "1", "CC", "BankSelect" }, P::DEV_CH_CC_CHANNELVOICEMSG);
+    shouldBe({ "mider", "1", "1", "CC", "bankselect" }, P::DEV_CH_CC_CHANNELVOICEMSG);
+    shouldBe({ "mider", "1", "1", "CC", "BANKSELECT" }, P::DEV_CH_CC_CHANNELVOICEMSG);
+    shouldBe({ "mider", "1", "1", "CC", "bs" }, P::DEV_CH_CC_CHANNELVOICEMSG);
+    shouldBe({ "mider", "1", "1", "CC", "BS" }, P::DEV_CH_CC_CHANNELVOICEMSG);
+
+    shouldBe({ "mider", "1", "start" }, P::DEV_SYSTEMRTMSG);
+    shouldBe({ "mider", "1", "SystemReset" }, P::DEV_SYSTEMRTMSG);
+
 
     // Help Test
     shouldBe({ "mider", "help" }, P::HELP);
