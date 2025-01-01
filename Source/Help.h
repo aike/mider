@@ -62,39 +62,39 @@ public:
         n = 0xFF;  byte0[n] = "System Reset";            byte1[n] = "-";                      byte2[n] = "-";
 
         // Control Change
-        n = 0x00; cc1[n] = "Bank Select";          cc2[n] = "MSB(0-127)";
-        n = 0x01; cc1[n] = "Modulation Wheel";     cc2[n] = "MSB(0-127)";
-        n = 0x02; cc1[n] = "Breath Controller";    cc2[n] = "MSB(0-127)";
-        n = 0x04; cc1[n] = "Foot Pedal";           cc2[n] = "MSB(0-127)";
-        n = 0x05; cc1[n] = "Portamento Time";      cc2[n] = "MSB(0-127)";
-        n = 0x06; cc1[n] = "Data Entry";           cc2[n] = "MSB(0-127)";
-        n = 0x07; cc1[n] = "Channel Volume";       cc2[n] = "MSB(0-127)";
-        n = 0x08; cc1[n] = "Balance";              cc2[n] = "MSB(0-127)";
-        n = 0x0A; cc1[n] = "Pan";                  cc2[n] = "MSB(0-127)";
-        n = 0x0B; cc1[n] = "Expression";           cc2[n] = "MSB(0-127)";
-        n = 0x0C; cc1[n] = "Effect Controller 1";  cc2[n] = "MSB(0-127)";
-        n = 0x0D; cc1[n] = "Effect Controller 2";  cc2[n] = "MSB(0-127)";
-        n = 0x10; cc1[n] = "General Purpose 1";    cc2[n] = "MSB(0-127)";
-        n = 0x11; cc1[n] = "General Purpose 2";    cc2[n] = "MSB(0-127)";
-        n = 0x12; cc1[n] = "General Purpose 3";    cc2[n] = "MSB(0-127)";
-        n = 0x13; cc1[n] = "General Purpose 4";    cc2[n] = "MSB(0-127)";
+        n = 0x00; cc1[n] = "Bank Select MSB";          cc2[n] = "MSB(0-127)";
+        n = 0x01; cc1[n] = "Modulation Wheel MSB";     cc2[n] = "MSB(0-127)";
+        n = 0x02; cc1[n] = "Breath Controller MSB";    cc2[n] = "MSB(0-127)";
+        n = 0x04; cc1[n] = "Foot Pedal MSB";           cc2[n] = "MSB(0-127)";
+        n = 0x05; cc1[n] = "Portamento Time MSB";      cc2[n] = "MSB(0-127)";
+        n = 0x06; cc1[n] = "Data Entry MSB";           cc2[n] = "MSB(0-127)";
+        n = 0x07; cc1[n] = "Channel Volume MSB";       cc2[n] = "MSB(0-127)";
+        n = 0x08; cc1[n] = "Balance MSB";              cc2[n] = "MSB(0-127)";
+        n = 0x0A; cc1[n] = "Pan MSB";                  cc2[n] = "MSB(0-127)";
+        n = 0x0B; cc1[n] = "Expression MSB";           cc2[n] = "MSB(0-127)";
+        n = 0x0C; cc1[n] = "Effect Controller 1 MSB";  cc2[n] = "MSB(0-127)";
+        n = 0x0D; cc1[n] = "Effect Controller 2 MSB";  cc2[n] = "MSB(0-127)";
+        n = 0x10; cc1[n] = "General Purpose 1 MSB";    cc2[n] = "MSB(0-127)";
+        n = 0x11; cc1[n] = "General Purpose 2 MSB";    cc2[n] = "MSB(0-127)";
+        n = 0x12; cc1[n] = "General Purpose 3 MSB";    cc2[n] = "MSB(0-127)";
+        n = 0x13; cc1[n] = "General Purpose 4 MSB";    cc2[n] = "MSB(0-127)";
 
-        n = 0x20; cc1[n] = "Bank Select";          cc2[n] = "LSB(0-127)";
-        n = 0x21; cc1[n] = "Modulation Wheel";     cc2[n] = "LSB(0-127)";
-        n = 0x22; cc1[n] = "Breath Controller";    cc2[n] = "LSB(0-127)";
-        n = 0x24; cc1[n] = "Foot Controller";      cc2[n] = "LSB(0-127)";
-        n = 0x25; cc1[n] = "Portamento Time";      cc2[n] = "LSB(0-127)";
-        n = 0x26; cc1[n] = "Data Entry";           cc2[n] = "LSB(0-127)";
-        n = 0x27; cc1[n] = "Volume";               cc2[n] = "LSB(0-127)";
-        n = 0x28; cc1[n] = "Balance";              cc2[n] = "LSB(0-127)";
-        n = 0x2A; cc1[n] = "Pan";                  cc2[n] = "LSB(0-127)";
-        n = 0x2B; cc1[n] = "Expression";           cc2[n] = "LSB(0-127)";
-        n = 0x2C; cc1[n] = "Effect Controll 1";    cc2[n] = "LSB(0-127)";
-        n = 0x2D; cc1[n] = "Effect Controll 2";    cc2[n] = "LSB(0-127)";
-        n = 0x30; cc1[n] = "General Purpose 1";    cc2[n] = "LSB(0-127)";
-        n = 0x31; cc1[n] = "General Purpose 2";    cc2[n] = "LSB(0-127)";
-        n = 0x32; cc1[n] = "General Purpose 3";    cc2[n] = "LSB(0-127)";
-        n = 0x33; cc1[n] = "General Purpose 4";    cc2[n] = "LSB(0-127)";
+        n = 0x20; cc1[n] = "Bank Select LSB";          cc2[n] = "LSB(0-127)";
+        n = 0x21; cc1[n] = "Modulation Wheel LSB";     cc2[n] = "LSB(0-127)";
+        n = 0x22; cc1[n] = "Breath Controller LSB";    cc2[n] = "LSB(0-127)";
+        n = 0x24; cc1[n] = "Foot Controller LSB";      cc2[n] = "LSB(0-127)";
+        n = 0x25; cc1[n] = "Portamento Time LSB";      cc2[n] = "LSB(0-127)";
+        n = 0x26; cc1[n] = "Data Entry LSB";           cc2[n] = "LSB(0-127)";
+        n = 0x27; cc1[n] = "Volume LSB";               cc2[n] = "LSB(0-127)";
+        n = 0x28; cc1[n] = "Balance LSB";              cc2[n] = "LSB(0-127)";
+        n = 0x2A; cc1[n] = "Pan LSB";                  cc2[n] = "LSB(0-127)";
+        n = 0x2B; cc1[n] = "Expression LSB";           cc2[n] = "LSB(0-127)";
+        n = 0x2C; cc1[n] = "Effect Controll 1 LSB";    cc2[n] = "LSB(0-127)";
+        n = 0x2D; cc1[n] = "Effect Controll 2 LSB";    cc2[n] = "LSB(0-127)";
+        n = 0x30; cc1[n] = "General Purpose 1 LSB";    cc2[n] = "LSB(0-127)";
+        n = 0x31; cc1[n] = "General Purpose 2 LSB";    cc2[n] = "LSB(0-127)";
+        n = 0x32; cc1[n] = "General Purpose 3 LSB";    cc2[n] = "LSB(0-127)";
+        n = 0x33; cc1[n] = "General Purpose 4 LSB";    cc2[n] = "LSB(0-127)";
 
         n = 0x40; cc1[n] = "Damper Pedal";         cc2[n] = "Off(0-63)/On(64-127)";
         n = 0x41; cc1[n] = "Portamento";           cc2[n] = "Off(0-63)/On(64-127)";
@@ -177,26 +177,7 @@ public:
                 }
             }
         }
-        // additional CC command name (ex. BankSelect1)
-        for (n = 0x00; n < 0x14; n++)
-        {
-            if (cc1[n] != "Undefined")
-            {
-                auto s = cc1[n] + " 1";
-                cc_cmd[toLowerNoSpace(s)] = n;
-                cc_cmd[toAbbreviation(cc1[n])] = n;
-            }
-        }
-        // additional CC command name (ex. BankSelect2)
-        for (n = 0x20; n < 0x34; n++)
-        {
-            if (cc1[n] != "Undefined")
-            {
-                auto s = cc1[n] + " 2";
-                cc_cmd[toLowerNoSpace(s)] = n;
-                cc_cmd[toAbbreviation(cc1[n])] = n;
-            }
-        }
+
     };
 
     ~Help() {};

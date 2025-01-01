@@ -34,11 +34,11 @@ int main()
     shouldBe({ "mider", "1", "1", "NO", "60", "100" }, P::DEV_CH_CHANNELVOICEMSG);
 
     // CC Test
-    shouldBe({ "mider", "1", "1", "CC", "BankSelect" }, P::DEV_CH_CC_CHANNELVOICEMSG);
-    shouldBe({ "mider", "1", "1", "CC", "bankselect" }, P::DEV_CH_CC_CHANNELVOICEMSG);
-    shouldBe({ "mider", "1", "1", "CC", "BANKSELECT" }, P::DEV_CH_CC_CHANNELVOICEMSG);
-    shouldBe({ "mider", "1", "1", "CC", "bs" }, P::DEV_CH_CC_CHANNELVOICEMSG);
-    shouldBe({ "mider", "1", "1", "CC", "BS" }, P::DEV_CH_CC_CHANNELVOICEMSG);
+    shouldBe({ "mider", "1", "1", "CC", "BankSelectMSB" }, P::DEV_CH_CC_CHANNELVOICEMSG);
+    shouldBe({ "mider", "1", "1", "CC", "bankselectmsb" }, P::DEV_CH_CC_CHANNELVOICEMSG);
+    shouldBe({ "mider", "1", "1", "CC", "BANKSELECTMSB" }, P::DEV_CH_CC_CHANNELVOICEMSG);
+    shouldBe({ "mider", "1", "1", "CC", "bsm" }, P::DEV_CH_CC_CHANNELVOICEMSG);
+    shouldBe({ "mider", "1", "1", "CC", "BSM" }, P::DEV_CH_CC_CHANNELVOICEMSG);
 
     shouldBe({ "mider", "1", "start" }, P::DEV_SYSTEMRTMSG);
     shouldBe({ "mider", "1", "SystemReset" }, P::DEV_SYSTEMRTMSG);
@@ -52,7 +52,7 @@ int main()
     shouldBe({ "mider", "help", "no" }, P::HELP_MSGNAME);
     shouldBe({ "mider", "help", "NO" }, P::HELP_MSGNAME);
     shouldBe({ "mider", "help", "CC" }, P::HELP_CC);
-    shouldBe({ "mider", "help", "CC", "BankSelect" }, P::HELP_CC_CCNAME);
+    shouldBe({ "mider", "help", "CC", "BankSelectMSB" }, P::HELP_CC_CCNAME);
 
     // Error Test
     shouldBe({ "mider", "1", "1", "NoteOn"}, P::E_SYNTAX_ERROR);
