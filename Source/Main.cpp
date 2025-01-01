@@ -6,6 +6,16 @@
   ==============================================================================
 */
 
+// TODO
+// - help
+// - sysex
+// - cc/cmの省略
+// - cc cccommand msb lsbで2メッセージ送信
+// - 複数メッセージ送信 NoteOn 60 100 NoteOn 64 100
+// - running status
+// - readme
+// - source header comment
+
 #include <JuceHeader.h>
 #include <regex>
 #include <iostream>
