@@ -26,20 +26,17 @@ MidiReceiver::~MidiReceiver()
 
 void MidiReceiver::handleIncomingMidiMessage(juce::MidiInput*, const juce::MidiMessage& message)
 {
-    //std::cout << "  Received MIDI message: " << message.getDescription() << std::endl;
-
     const uint8_t* u8data = message.getRawData();
     int size = message.getRawDataSize();
     // uint8_t[] ‚ð std::vector<uint8_t> ‚É•ÏŠ·
     std::vector<uint8_t> data(u8data, u8data + size);
 
-    int ch = data[0] & 0x0F;
     std::stringstream dec;
     std::stringstream hex;
     for (int i = 0; i < size; i++)
     {
         dec << std::to_string(data[i]);
-        hex << std::setfill('0') << std::setw(2) << std::hex << std::uppercase << data[i] << "h";
+        hex << std::setfill('0') << std::setw(2) << std::hex << std::uppercase << (int)data[i] << "h";
         if (i < size - 1)
         {
             dec << " ";
@@ -47,8 +44,15 @@ void MidiReceiver::handleIncomingMidiMessage(juce::MidiInput*, const juce::MidiM
         }
     }
 
-    std::cout << "  channel: " << (ch + 1) << std::endl;
+    // show dump
+    MSG msgtype = h.getMessageType(data);
+    if ((msgtype == MSG::ChannelVoice) || (msgtype == MSG::ChannelVoiceCc) || (msgtype == MSG::ChannelMode))
+    {
+        int ch = (int)data[0] & 0x0F;
+        std::cout << "  channel: " << (ch + 1) << std::endl;
+    }
     std::cout << "  bytes  : " << hex.str() << " (" << dec.str() << ")" << std::endl;
+    std::cout << "  type   : " << h.getMessageTypeName(msgtype) << std::endl;
     std::cout << "  message: " << h.toString(data) << std::endl;
     std::cout << std::endl;
 }

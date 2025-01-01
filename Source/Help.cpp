@@ -115,32 +115,19 @@ std::string Help::ccName(int n)
     return "";
 }
 
-/*
-std::string Help::toString(int b0, int b1, int b2)
-{
-    std::string s = "";
-    int command = b0 & 0xF0;
-    if (commandName(command) == "Control Change")
-    {
-        s = "[CC] [" + cc1[b1] + "] [" + cc2[b1] + ":" + std::to_string(b2) + "]";
-    }
-    else
-    {
-        s = "[" + byte0[b0] + "] [" + byte1[b0] + ":" + std::to_string(b1) + "] [" + byte2[b0] + ":" + std::to_string(b2) + "]";
-    }
-    return s;
-}
-*/
-
 std::string Help::toString(std::vector<uint8_t> byte)
 {
     std::string s = "";
     int msg = byte[0];
+    MSG msgtype = getMessageType(byte);
+    if ((msgtype == MSG::ChannelVoice) || (msgtype == MSG::ChannelVoiceCc) || (msgtype == MSG::ChannelMode))
+    {
+        msg = msg & 0xF0;
+    }
     int len = getMessageLength(msg);
 
     if (byte.size() >= len)
     {
-        MSG msgtype = getMessageType(byte);
         if (msgtype == MSG::ChannelVoiceCc)
         {
             int cctype = byte[1];
@@ -204,6 +191,10 @@ MSG Help::getMessageType(std::vector<uint8_t> byte)
     return MSG::SystemRealtime;
 }
 
+std::string Help::getMessageTypeName(MSG msgtype)
+{
+    return msgtypename[msgtype];
+}
 
 int Help::getMessageLength(int n)
 {

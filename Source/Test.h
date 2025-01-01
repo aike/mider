@@ -62,11 +62,12 @@ int main()
     shouldBe({ "mider", "1", "1", "NoteOn", "60", "100" }, { 0x90, 60, 100 });
     shouldBe({ "mider", "1", "2", "NoteOn", "60", "100" }, { 0x91, 60, 100 });
     shouldBe({ "mider", "1", "3", "ProgramChange", "10"}, {0xC2, 10});
-    shouldBe({ "mider", "1", "1", "TuneRequest" }, { 0xF6 });
+    shouldBe({ "mider", "1", "TuneRequest" }, { 0xF6 });
+    shouldBe({ "mider", "1", "Start" }, { 0xFA });
+
 
     shouldBe({ "mider", "1", "2", "3", "4", "5", "6" }, { 2, 3, 4, 5, 6 });
     shouldBe({ "mider", "0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11"}, {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11});
-
 
     return 0;
 }

@@ -32,7 +32,10 @@ Help h;
 ArgParser parser;
 MidiReceiver receiver;
 
-#define TEST
+constexpr auto BUFMAX = 4096;
+uint8_t msgbuf[BUFMAX];
+
+//#define TEST
 
 #include "Test.h"
 
@@ -51,10 +54,9 @@ void signalHandler(int)
 #ifndef TEST
 int main (int argc, char* argv[])
 {
-    std::vector<uint8_t>b;
     std::vector<std::string> args(argv, argv + argc);
-
     P state = parser.parse(args);
+
     switch (state)
     {
     case P::DEVICE:
@@ -75,8 +77,7 @@ int main (int argc, char* argv[])
     case P::DEV_SYSTEMCOMMONMSG:
     case P::DEV_SYSTEMRTMSG:
     case P::DEV_BYTELIST:
-        b = parser.getBytes();
-        sendMessage(parser.getDevice(), b);
+        sendMessage(parser.getDevice(), parser.getBytes());
         break;
  
     case P::DEV_RECEIVE:
@@ -103,138 +104,6 @@ int main (int argc, char* argv[])
     default:
         break;
     }
-
-
-
-    ////// (2) mider device channel command byte1 byte2 ////////
-    //else if (isInt128(arg[1]) && isInt1to16(arg[2]) && isAlphabet(arg[3]) && !isAlphabet(arg[4]))
-    //{
-    //    int device = std::stoi(arg[1]);
-    //    int ch0    = std::stoi(arg[2]) - 1;
-    //    int byte0  = h.commandNumber(toLower(arg[3]));
-    //    int byte1  = getNumber(arg[4], 0);
-    //    int byte2  = getNumber(arg[5], 0);
-
-    //    if (byte0 < 0)
-    //    {
-    //        std::cerr << "ERROR: Massage name(" << arg[3] << ") not found." << std::endl;
-    //        exit(1);
-    //    }
-
-    //    sendMessage(device, ch0, byte0 + ch0, byte1, byte2);
-    //}
-
-    ////// (3) mider device channel "cc" cc_command byte2 ////////
-    //else if (isInt128(arg[1]) && isInt1to16(arg[2]) && isAlphabet(arg[3]) && isAlphabet(arg[4]))
-    //{
-    //    int device = std::stoi(arg[1]);
-    //    int ch0 = std::stoi(arg[2]) - 1;
-    //    int byte0 = h.commandNumber(toLower(arg[3]));
-    //    int byte1 = h.ccCommandNumber(toLower(arg[4]));
-    //    int byte2 = getNumber(arg[5], 0);
-
-    //    if (byte0 != 0xB0)
-    //    {
-    //        std::cerr << "ERROR: Argument syntax error." << std::endl;
-    //        exit(1);
-    //    }
-    //    if (byte1 < 0)
-    //    {
-    //        std::cerr << "ERROR: CC name(" << arg[4] << ") not found." << std::endl;
-    //        exit(1);
-    //    }
-
-    //    sendMessage(device, ch0, byte0 + ch0, byte1, byte2);
-    //}
-
-    ////// (4) mider device byte0 byte1 byte2 ////////
-    //else if (isInt128(arg[1]) && isInt256(arg[2]) && isInt256(arg[3]) && isInt256(arg[4]))
-    //{
-    //    int device = std::stoi(arg[1]);
-    //    int ch0    = getNumber(arg[2]) & 0x0F;
-    //    int byte0  = getNumber(arg[2]);
-    //    int byte1  = getNumber(arg[3]);
-    //    int byte2  = getNumber(arg[4]);
-
-    //    sendMessage(device, ch0, byte0 + ch0, byte1, byte2);
-    //}
-
-    ////// (5) mider help ////////
-//    else if (arg[1] == "help")
-//    {
-//        if (arg[2] == "")
-//        {
-//            std::cout << std::endl;
-//            std::cout << "Message Help:" << std::endl;
-//            for (int i = 0; i < 256; i++)
-//            {
-//                if (h.commandName(i) != "Undefined")
-//                {
-//                    std::cout << "  " << h.commandHelp(i) << std::endl;
-//                }
-//            }
-//            std::cout << std::endl;
-//        }
-//        else if (isAlphabet(arg[2]) && arg[3] == "")
-//        {
-//            int n = h.commandNumber(arg[2]);
-//            if (n < 0)
-//            {
-//                std::cout << arg[2] << " is not a message." << std::endl;
-//                exit(1);
-//            }
-//
-//            std::cout << std::endl;
-//            std::cout << "Message Help:" << std::endl;
-//            std::cout << "  " << h.commandHelp1(n) << std::endl;
-//            if (h.commandName(n) == "Control Change")
-//            {
-//                std::cout << std::endl;
-//                std::cout << "Control Change Help:" << std::endl;
-//                for (int i = 0; i < 256; i++)
-//                {
-//                    if (h.ccCommandName(i) != "Undefined")
-//                    {
-//                        std::cout << "  " << h.ccCommandHelp(i) << std::endl;
-//                    }
-//                }
-//            }
-//        }
-//        else if (isAlphabet(arg[2]) && isAlphabet(arg[3]))
-//        {
-//            int n = h.commandNumber(arg[2]);
-//            if (h.commandName(n) != "Control Change")
-//            {
-//                std::cout << arg[2] << " is not a message." << std::endl;
-//                exit(1);
-//            }
-//
-//            int m = h.ccCommandNumber(arg[3]);
-//            if (m < 0)
-//            {
-//                std::cout << arg[3] << " is not a control change." << std::endl;
-//                exit(1);
-//            }
-//
-////            std::cout << std::endl;
-////            std::cout << std::endl;
-////            std::cout << "Message Help:" << std::endl;
-////            std::cout << "  " << h.commandHelp1(n) << std::endl;
-//            std::cout << std::endl;
-//            std::cout << "Control Change Help:" << std::endl;
-//            std::cout << "  B0h Control Change | " << h.ccCommandHelp1(m) << std::endl;
-//        }
-//        std::cout << std::endl;
-//
-//        return 0;
-//    }
-//
-//    ////// the other argument pattern /////////
-//    else
-//    {
-//        std::cerr << "ERROR: Argument syntax error." << std::endl;
-//        exit(1);
-//    }
 
     return 0;
 }
@@ -326,9 +195,6 @@ void sendMessage(int device, std::vector<uint8_t>data)
         exit(P::E_MIDI_DEVICE_ERROR - P::ERROR);
     }
 
-
-    int ch = (int)data[0] & 0x0F;
-
     std::stringstream dec;
     std::stringstream hex;
     for (int i = 0; i < data.size(); i++)
@@ -345,61 +211,27 @@ void sendMessage(int device, std::vector<uint8_t>data)
     // show dump
     std::cout << std::endl;
     std::cout << "  device : " << device << " \"" << deviceInfo.name << "\"" << std::endl;
-    std::cout << "  channel: " << (ch + 1) << std::endl;
+    MSG msgtype = h.getMessageType(data);
+    if ((msgtype == MSG::ChannelVoice) || (msgtype == MSG::ChannelVoiceCc) || (msgtype == MSG::ChannelMode))
+    {
+        int ch = (int)data[0] & 0x0F;
+        std::cout << "  channel: " << (ch + 1) << std::endl;
+    }
     std::cout << "  bytes  : " << hex.str() << " (" << dec.str() << ")" << std::endl;
+    std::cout << "  type   : " << h.getMessageTypeName(msgtype) << std::endl;
     std::cout << "  message: " << h.toString(data) << std::endl;
     std::cout << std::endl;
 
     // send message
-    //auto msg = juce::MidiMessage(parser.getBytes());
-    //midiOutput->sendMessageNow(msg);
-
-}
-
-/*
-void sendMessage(int device, int channel, int byte0, int byte1, int byte2)
-{
-    auto midiOutputDevices = juce::MidiOutput::getAvailableDevices();
-
-    // check device
-    if (midiOutputDevices.isEmpty())
+    if (data.size() >= BUFMAX)
     {
-        std::cerr << "ERROR: No MIDI output devices found." << std::endl;
-        exit(2);
+        std::cerr << "ERROR: Message buffer overflow." << std::endl;
+        exit(P::E_MSGBUF_ERROR - P::ERROR);
     }
-
-    // select device
-    auto deviceInfo = midiOutputDevices[device - 1];
-    auto midiOutput = juce::MidiOutput::openDevice(deviceInfo.identifier);
-    if (midiOutput == nullptr)
-    {
-        std::cerr << "ERROR: Failed to open MIDI output device." << std::endl;
-        exit(2);
-    }
-
-
-    // show dump
-    std::stringstream hex0, hex1, hex2;
-    hex0 << std::setfill('0') << std::setw(2) << std::hex << std::uppercase << byte0 << "h";
-    hex1 << std::setfill('0') << std::setw(2) << std::hex << std::uppercase << byte1 << "h";
-    hex2 << std::setfill('0') << std::setw(2) << std::hex << std::uppercase << byte2 << "h";
-    std::cout << std::endl;
-    std::cout << "  device : " << device << " \"" << deviceInfo.name << "\"" << std::endl;
-    std::cout << "  channel: " << (channel + 1) << std::endl;
-    std::cout << "  bytes  : " << hex0.str() << " " << hex1.str() << " " << hex2.str();
-    std::cout << " (" << byte0 << " " << byte1 << " " << byte2 << ")" << std::endl;
-    std::cout << std::endl;
-    std::cout << "  " << h.toString(byte0 & 0xF0, byte1, byte2) << std::endl;
-    std::cout << std::endl;
-
-    // send message
-    auto msg = juce::MidiMessage(byte0, byte1, byte2);
-
-    // std::cout << msg.getDescription() << std::endl;
-
+    std::copy(data.begin(), data.end(), msgbuf);
+    auto msg = juce::MidiMessage(msgbuf, (int)data.size());
     midiOutput->sendMessageNow(msg);
 }
-*/
 
 void receiveMessage(int device)
 {

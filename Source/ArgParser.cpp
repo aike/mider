@@ -115,7 +115,7 @@ P ArgParser::parse(std::vector<std::string>arg)
         int len = h.getMessageLength(byte0);
         if (len == 1)
         {
-            setBytes({ byte0 + channel });
+            setBytes({ byte0 });
         }
         else if (len == 2)
         {

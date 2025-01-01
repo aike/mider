@@ -213,6 +213,7 @@ public:
     //std::string toString(int byte0, int byte1, int byte2);
     std::string toString(std::vector<uint8_t> byte);
     MSG getMessageType(std::vector<uint8_t> byte);
+    std::string getMessageTypeName(MSG msgtype);
     int getMessageLength(int n);
 
 private:
@@ -228,6 +229,15 @@ private:
     std::string toLowerNoSpace(const std::string& in_s);
     std::string toAbbreviation(const std::string& in_s);
     std::string fmt(std::string s, int width);
+
+    std::string msgtypename[6] = {
+        "Channel Voice Message",
+        "Channel Voice Message(CC)",
+        "Channel Mode Message",
+        "System Common Message",
+        "System Realtime Message",
+        "Not Status Byte"
+    };
 };
 
 

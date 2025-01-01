@@ -39,7 +39,8 @@ enum P {
     E_SYNTAX_ERROR,
     E_MSGNAME_ERROR,
     E_CCNAME_ERROR,
-    E_ARG_ERROR
+    E_ARG_ERROR,
+    E_MSGBUF_ERROR
 };
 
 
