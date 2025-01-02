@@ -56,7 +56,6 @@ P ArgParser::parse(std::vector<std::string>arg)
     }
 
     ////// (2) mider device channel command byte1 byte2 ////////
-    // TODO: ‰Â•Ï’·ˆø”
     else if (isInt128(arg[1]) && isInt1to16(arg[2]) && isAlphabet(arg[3]) && !isAlphabet(arg[4]))
     {
         device = std::stoi(arg[1]);
@@ -64,6 +63,21 @@ P ArgParser::parse(std::vector<std::string>arg)
         int byte0 = h.commandNumber(toLower(arg[3]));
         if (byte0 < 0)
         {
+            // mider device channel cccommand byte1
+            int byte1 = h.ccCommandNumber(toLower(arg[3]));
+            if (byte1 >= 0)
+            {
+                int byte2 = getNumber(arg[4]);
+                if (byte2 < 0)
+                {
+                    text = "ERROR: Argument syntax error.\n";
+                    text += "  " + h.ccCommandHelp1(byte1);
+                    return P::E_SYNTAX_ERROR;
+                }
+                setBytes({ 0xB0 + channel, byte1, byte2 });
+                return P::DEV_CH_CC_CHANNELVOICEMSG;
+            }
+
             text = "ERROR: Massage name(" + arg[3] + ") not found.";
             return P::E_MSGNAME_ERROR;
         }
