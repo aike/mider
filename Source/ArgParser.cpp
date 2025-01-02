@@ -132,7 +132,7 @@ P ArgParser::parse(std::vector<std::string>arg)
     }
 
     ////// (2) mider device command [byte1 [byte2]] ////////
-    else if (isInt128(arg[1]) && isAlphabet(arg[2]) && !isAlphabet(arg[3]))
+    else if (isInt128(arg[1]) && isAlphabet(arg[2]) && !isInt256(arg[2]) && !isAlphabet(arg[3]))
     {
         device = std::stoi(arg[1]);
         channel = -1;
@@ -222,7 +222,6 @@ P ArgParser::parse(std::vector<std::string>arg)
     else if (isInt128(arg[1]) && isInt256(arg[2]))
     {
         device = std::stoi(arg[1]);
-        channel = getNumber(arg[2]) & 0x0F;
 
         std::vector<int> bytelist;
         for (int i = 2; i < arg.size(); i++)
