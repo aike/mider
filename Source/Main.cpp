@@ -18,6 +18,8 @@
 // - 複数メッセージ送信 NoteOn 60 100 NoteOn 64 100
 // - running status
 
+constexpr auto VERSION = "0.1.0";
+
 #include <JuceHeader.h>
 #include <regex>
 #include <iostream>
@@ -47,7 +49,7 @@ MidiReceiver receiver;
 constexpr auto BUFMAX = 4096;
 uint8_t msgbuf[BUFMAX];
 
-//#define TEST
+#define TEST
 
 #include "Test.h"
 
@@ -71,6 +73,9 @@ int main (int argc, char* argv[])
 
     switch (state)
     {
+    case P::SHOWVERSION:
+        std::cout << "mider " << VERSION << std::endl;
+        break;
     case P::DEVICE:
         listAllDevices();
         std::cout << std::endl;

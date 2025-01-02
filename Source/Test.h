@@ -19,6 +19,10 @@ int main()
 {
     std::vector<std::string> arg;
 
+    ///////////////////////////////////////////////////////
+    /// Parser Test
+    ///////////////////////////////////////////////////////
+
     shouldBe({ "mider" }, P::NO_ARGS_HELP);
 
     shouldBe({ "mider", "devices" }, P::DEVICE);
@@ -26,20 +30,33 @@ int main()
     shouldBe({ "mider", "outdevices" }, P::OUTDEVICE);
     shouldBe({ "mider", "1", "receive" }, P::DEV_RECEIVE);
 
-    // Message Test
+    // Channel Voice Message Test
     shouldBe({ "mider", "1", "1", "NoteOn", "60", "100"}, P::DEV_CH_CHANNELVOICEMSG);
     shouldBe({ "mider", "1", "1", "noteon", "60", "100" }, P::DEV_CH_CHANNELVOICEMSG);
     shouldBe({ "mider", "1", "1", "NOTEON", "60", "100" }, P::DEV_CH_CHANNELVOICEMSG);
     shouldBe({ "mider", "1", "1", "no", "60", "100" }, P::DEV_CH_CHANNELVOICEMSG);
     shouldBe({ "mider", "1", "1", "NO", "60", "100" }, P::DEV_CH_CHANNELVOICEMSG);
 
-    // CC Test
-    shouldBe({ "mider", "1", "1", "CC", "BankSelectMSB" }, P::DEV_CH_CC_CHANNELVOICEMSG);
-    shouldBe({ "mider", "1", "1", "CC", "bankselectmsb" }, P::DEV_CH_CC_CHANNELVOICEMSG);
-    shouldBe({ "mider", "1", "1", "CC", "BANKSELECTMSB" }, P::DEV_CH_CC_CHANNELVOICEMSG);
-    shouldBe({ "mider", "1", "1", "CC", "bsm" }, P::DEV_CH_CC_CHANNELVOICEMSG);
-    shouldBe({ "mider", "1", "1", "CC", "BSM" }, P::DEV_CH_CC_CHANNELVOICEMSG);
+    // Channel Voice Message (CC) Test
+    shouldBe({ "mider", "1", "1", "CC", "BankSelectMSB", "10" }, P::DEV_CH_CC_CHANNELVOICEMSG);
+    shouldBe({ "mider", "1", "1", "CC", "bankselectmsb", "10" }, P::DEV_CH_CC_CHANNELVOICEMSG);
+    shouldBe({ "mider", "1", "1", "CC", "BANKSELECTMSB", "10" }, P::DEV_CH_CC_CHANNELVOICEMSG);
+    shouldBe({ "mider", "1", "1", "CC", "bsm", "10" }, P::DEV_CH_CC_CHANNELVOICEMSG);
+    shouldBe({ "mider", "1", "1", "CC", "BSM", "10" }, P::DEV_CH_CC_CHANNELVOICEMSG);
 
+    // Channel Voice Message (CC省略表記) Test
+    shouldBe({ "mider", "1", "1", "BankSelectMSB", "10" }, P::DEV_CH_CC_CHANNELVOICEMSG);
+
+    // Channel Mode Message Test
+    shouldBe({ "mider", "1", "1", "CM", "AllNotesOff", "0" }, P::DEV_CH_CM_CHANNELMODEMSG);
+
+    // Channel Mode Message (省略表記) Test
+    shouldBe({ "mider", "1", "1", "AllNotesOff", "0" }, P::DEV_CH_CM_CHANNELMODEMSG);
+
+    // System Common Message Test
+    shouldBe({ "mider", "1", "TuneRequest" }, P::DEV_SYSTEMCOMMONMSG);
+
+    // System Realtime Message Test
     shouldBe({ "mider", "1", "start" }, P::DEV_SYSTEMRTMSG);
     shouldBe({ "mider", "1", "SystemReset" }, P::DEV_SYSTEMRTMSG);
 
@@ -57,15 +74,41 @@ int main()
     // Error Test
     shouldBe({ "mider", "1", "1", "NoteOn"}, P::E_SYNTAX_ERROR);
     shouldBe({ "mider", "1", "1", "NoteOn", "60"}, P::E_SYNTAX_ERROR);
+    shouldBe({ "mider", "1", "1", "CC", "BankSelectMSB" }, P::E_SYNTAX_ERROR);
+    shouldBe({ "mider", "1", "1", "BankSelectMSB" }, P::E_SYNTAX_ERROR);
 
 
-    shouldBe({ "mider", "1", "1", "NoteOn", "60", "100" }, { 0x90, 60, 100 });
-    shouldBe({ "mider", "1", "2", "NoteOn", "60", "100" }, { 0x91, 60, 100 });
-    shouldBe({ "mider", "1", "3", "ProgramChange", "10"}, {0xC2, 10});
+    ///////////////////////////////////////////////////////
+    /// Message Generation Test
+    ///////////////////////////////////////////////////////
     shouldBe({ "mider", "1", "TuneRequest" }, { 0xF6 });
     shouldBe({ "mider", "1", "Start" }, { 0xFA });
 
+    // Channel Voice Message Test
+    shouldBe({ "mider", "1", "1", "NoteOn", "60", "100" }, { 0x90, 60, 100 });
+    shouldBe({ "mider", "1", "2", "NoteOn", "60", "100" }, { 0x91, 60, 100 });
+    shouldBe({ "mider", "1", "3", "ProgramChange", "10" }, { 0xC2, 10 });
 
+    // Channel Voice Message (CC) Test
+    shouldBe({ "mider", "1", "1", "CC", "BankSelectLSB", "10" }, {0xB0, 0x20, 0x0A });
+
+    // Channel Voice Message (CC省略表記) Test
+    shouldBe({ "mider", "1", "1", "BankSelectLSB", "10" }, { 0xB0, 0x20, 0x0A });
+
+    // Channel Mode Message Test
+    shouldBe({ "mider", "1", "1", "CM", "AllNotesOff", "0" }, { 0xB0, 0x7B, 0x00 });
+
+    // Channel Mode Message (省略表記) Test
+    shouldBe({ "mider", "1", "1", "AllNotesOff", "0" }, { 0xB0, 0x7B, 0x00 });
+
+    // System Common Message Test
+    shouldBe({ "mider", "1", "TuneRequest" }, { 0xF6 });
+
+    // System Realtime Message Test
+    shouldBe({ "mider", "1", "start" }, { 0xFA });
+    shouldBe({ "mider", "1", "SystemReset" }, { 0xFF });
+
+    // Byte List
     shouldBe({ "mider", "1", "2", "3", "4", "5", "6" }, { 2, 3, 4, 5, 6 });
     shouldBe({ "mider", "0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11"}, {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11});
 
@@ -78,12 +121,14 @@ void shouldBe(std::vector<std::string> args, P expect)
 
     if (actual != expect)
     {
-        std::cout << "[" << actual << "] != [" << expect << "] ";
+        std::cout << "Parse Test NG: ";
         for (const auto& arg : args)
         {
             std::cout << arg << " ";
         }
         std::cout << std::endl;
+        std::cout << "  actual [" << parser.getMessageTypeName(actual) << "]" << std::endl;
+        std::cout << "  expect [" << parser.getMessageTypeName(expect) << "]" << std::endl;
     }
 }
 

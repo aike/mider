@@ -35,6 +35,14 @@ P ArgParser::parse(std::vector<std::string>arg)
     }
 
     ////// (1) mider command ////////
+    else if ((arg[1] == "version") && (arg[2] == ""))
+    {
+        return P::SHOWVERSION;
+    }
+    else if ((arg[1] == "--version") && (arg[2] == ""))
+    {
+        return P::SHOWVERSION;
+    }
     else if ((arg[1] == "devices") && (arg[2] == ""))
     {
         return P::DEVICE;
@@ -75,7 +83,14 @@ P ArgParser::parse(std::vector<std::string>arg)
                     return P::E_SYNTAX_ERROR;
                 }
                 setBytes({ 0xB0 + channel, byte1, byte2 });
-                return P::DEV_CH_CC_CHANNELVOICEMSG;
+                if (h.getMessageType(getBytes()) == MSG::ChannelVoiceCc)
+                {
+                    return P::DEV_CH_CC_CHANNELVOICEMSG;
+                }
+                else
+                {
+                    return P::DEV_CH_CM_CHANNELMODEMSG;
+                }
             }
 
             text = "ERROR: Massage name(" + arg[3] + ") not found.";
@@ -170,7 +185,7 @@ P ArgParser::parse(std::vector<std::string>arg)
         channel = std::stoi(arg[2]) - 1;
         int byte0 = h.commandNumber(toLower(arg[3]));
         int byte1 = h.ccCommandNumber(toLower(arg[4]));
-        int byte2 = getNumber(arg[5], 0);
+        int byte2 = getNumber(arg[5]);
 
         if (byte0 != 0xB0)
         {
@@ -182,8 +197,21 @@ P ArgParser::parse(std::vector<std::string>arg)
             text = "ERROR: CC name(" + arg[4] + ") not found.";
             return P::E_CCNAME_ERROR;
         }
+        if (byte2 < 0)
+        {
+            text = "ERROR: Argument syntax error.";
+            return P::E_SYNTAX_ERROR;
+        }
 
         setBytes({ byte0 + channel, byte1, byte2 });
+        if (h.getMessageType(getBytes()) == MSG::ChannelVoiceCc)
+        {
+            return P::DEV_CH_CC_CHANNELVOICEMSG;
+        }
+        else
+        {
+            return P::DEV_CH_CM_CHANNELMODEMSG;
+        }
 
         return P::DEV_CH_CC_CHANNELVOICEMSG;
     }
@@ -281,6 +309,11 @@ int ArgParser::getChannel(void)
 std::string ArgParser::getText(void)
 {
     return text;
+}
+
+std::string ArgParser::getMessageTypeName(P p)
+{
+    return ptext[p];
 }
 
 std::vector<uint8_t> ArgParser::getBytes(void)

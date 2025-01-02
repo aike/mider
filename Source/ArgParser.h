@@ -15,6 +15,7 @@
 #include "Help.h"
 
 enum P {
+    SHOWVERSION,
     DEVICE,
     INDEVICE,
     OUTDEVICE,
@@ -47,7 +48,33 @@ enum P {
 class ArgParser
 {
 public:
-    ArgParser() {};
+    ArgParser() {
+        ptext[SHOWVERSION] = "SHOWVERSION";
+        ptext[DEVICE] = "DEVICE";
+        ptext[INDEVICE] = "INDEVICE";
+        ptext[OUTDEVICE] = "OUTDEVICE";
+        ptext[DEV_CH_CHANNELVOICEMSG] = "DEV_CH_CHANNELVOICEMSG";
+        ptext[DEV_CH_CC_CHANNELVOICEMSG] = "DEV_CH_CC_CHANNELVOICEMSG";
+        ptext[DEV_CH_CM_CHANNELMODEMSG] = "DEV_CH_CM_CHANNELMODEMSG";
+        ptext[DEV_SYSTEMCOMMONMSG] = "DEV_SYSTEMCOMMONMSG";
+        ptext[DEV_SYSTEMRTMSG] = "DEV_SYSTEMRTMSG";
+        ptext[DEV_BYTELIST] = "DEV_BYTELIST";
+        ptext[DEV_RECEIVE] = "DEV_RECEIVE";
+        ptext[NO_ARGS_HELP] = "NO_ARGS_HELP";
+        ptext[HELP] = "HELP,";
+        ptext[HELP_MSGNAME] = "HELP_MSGNAME";
+        ptext[HELP_CC] = "HELP_CC";
+        ptext[HELP_CC_CCNAME] = "HELP_CC_CCNAME";
+        ptext[HELP_CM] = "HELP_CM";
+        ptext[HELP_CM_CMNAME] = "HELP_CM_CMNAME";
+        ptext[ERROR] = "ERROR";
+        ptext[E_MIDI_DEVICE_ERROR] = "E_MIDI_DEVICE_ERROR";
+        ptext[E_SYNTAX_ERROR] = "E_SYNTAX_ERROR";
+        ptext[E_MSGNAME_ERROR] = "E_MSGNAME_ERROR";
+        ptext[E_CCNAME_ERROR] = "E_CCNAME_ERROR";
+        ptext[E_ARG_ERROR] = "E_ARG_ERROR";
+        ptext[E_MSGBUF_ERROR] = "E_MSGBUF_ERROR";
+    };
     ~ArgParser() {};
 
     P parse(std::vector<std::string>arg);
@@ -55,6 +82,7 @@ public:
     int getChannel(void);
     std::vector<uint8_t>getBytes(void);
     std::string getText(void);
+    std::string getMessageTypeName(P p);
 
 private:
 
@@ -76,4 +104,6 @@ private:
     int channel = 0;
     std::vector<uint8_t> bytes;
     std::string text;
+    std::string ptext[25];
+
 };
