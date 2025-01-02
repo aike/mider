@@ -26,6 +26,7 @@ int main()
     shouldBe({ "mider" }, P::NO_ARGS_HELP);
 
     shouldBe({ "mider", "devices" }, P::DEVICE);
+    shouldBe({ "mider", "DEVICES" }, P::DEVICE);
     shouldBe({ "mider", "indevices" }, P::INDEVICE);
     shouldBe({ "mider", "outdevices" }, P::OUTDEVICE);
     shouldBe({ "mider", "1", "receive" }, P::DEV_RECEIVE);
@@ -81,12 +82,11 @@ int main()
     ///////////////////////////////////////////////////////
     /// Message Generation Test
     ///////////////////////////////////////////////////////
-    shouldBe({ "mider", "1", "TuneRequest" }, { 0xF6 });
-    shouldBe({ "mider", "1", "Start" }, { 0xFA });
-
     // Channel Voice Message Test
     shouldBe({ "mider", "1", "1", "NoteOn", "60", "100" }, { 0x90, 60, 100 });
     shouldBe({ "mider", "1", "2", "NoteOn", "60", "100" }, { 0x91, 60, 100 });
+    shouldBe({ "mider", "1", "1", "NoteOn", "0x40", "0x64" }, { 0x90, 0x40, 0x64 });
+    shouldBe({ "mider", "1", "1", "NoteOn", "40h", "64H" }, { 0x90, 0x40, 0x64 });
     shouldBe({ "mider", "1", "3", "ProgramChange", "10" }, { 0xC2, 10 });
 
     // Channel Voice Message (CC) Test

@@ -28,6 +28,8 @@ P ArgParser::parse(std::vector<std::string>arg)
         arg.push_back("");
     }
 
+    std::string arg1Lower = toLower(arg[1]);
+
     ////// (0) mider ////////
     if (arg[1] == "")
     {
@@ -35,23 +37,23 @@ P ArgParser::parse(std::vector<std::string>arg)
     }
 
     ////// (1) mider command ////////
-    else if ((arg[1] == "version") && (arg[2] == ""))
+    else if ((arg1Lower == "version") && (arg[2] == ""))
     {
         return P::SHOWVERSION;
     }
-    else if ((arg[1] == "--version") && (arg[2] == ""))
+    else if ((arg1Lower == "--version") && (arg[2] == ""))
     {
         return P::SHOWVERSION;
     }
-    else if ((arg[1] == "devices") && (arg[2] == ""))
+    else if ((arg1Lower == "devices") && (arg[2] == ""))
     {
         return P::DEVICE;
     }
-    else if ((arg[1] == "indevices") && (arg[2] == ""))
+    else if ((arg1Lower == "indevices") && (arg[2] == ""))
     {
         return P::INDEVICE;
     }
-    else if ((arg[1] == "outdevices") && (arg[2] == ""))
+    else if ((arg1Lower == "outdevices") && (arg[2] == ""))
     {
         return P::OUTDEVICE;
     }
@@ -378,7 +380,7 @@ bool ArgParser::isInt256(std::string s)
 int ArgParser::getNumber(std::string s, int defval)
 {
     std::regex re_dec(R"(^\d?\d?\d$)");
-    std::regex re_hex1(R"(^[0-9a-fA-F]?[0-9a-fA-F]h$)");
+    std::regex re_hex1(R"(^[0-9a-fA-F]?[0-9a-fA-F][hH]$)");
     std::regex re_hex2(R"(^0x[0-9a-fA-F]?[0-9a-fA-F]$)");
     std::smatch match;
     int value = defval;
