@@ -10,6 +10,7 @@ simple command-line MIDI messaging tool
 ## Usage
 
 ### Send MIDI Message
+```
  mider device channel command [byte ...]
  mider device channel "ControlChange" command byte
  mider device channel "ChannelMode" command byte
