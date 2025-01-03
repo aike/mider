@@ -29,6 +29,7 @@ enum P {
 
     NO_ARGS_HELP,
     HELP,
+    HELP_MIDERCOMMAND,
     HELP_MSGNAME,
     HELP_CC,
     HELP_CC_CCNAME,
@@ -63,6 +64,7 @@ public:
         ptext[DEV_RECEIVE] = "DEV_RECEIVE";
         ptext[NO_ARGS_HELP] = "NO_ARGS_HELP";
         ptext[HELP] = "HELP,";
+        ptext[HELP_MIDERCOMMAND] = "HELP_MIDERCOMMAND";
         ptext[HELP_MSGNAME] = "HELP_MSGNAME";
         ptext[HELP_CC] = "HELP_CC";
         ptext[HELP_CC_CCNAME] = "HELP_CC_CCNAME";
@@ -105,6 +107,6 @@ private:
     int channel = 0;
     std::vector<uint8_t> bytes;
     std::string text;
-    std::string ptext[26];
+    std::string ptext[27];
 
 };

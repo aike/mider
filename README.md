@@ -1,10 +1,11 @@
 # mider
 simple command-line MIDI messaging tool
 
-## Description
-This is a command line tool for testing and controlling MIDI-compatible devices and software.  
+## DESCRIPTION
+This is a command line tool for testing and controlling MIDI devices and software.  
 With detailed help and runtime display, you can easily send MIDI messages without referring to the specification documents.  
-Many abbreviations are available, allowing you to execute commands with short inputs.
+Many abbreviations are available, allowing you to execute commands with short inputs.  
+Not support MIDI 2.0.
 
 ## FEATURES
 - list MIDI devices
@@ -63,7 +64,7 @@ Sends a CC MSB message and a CC LSB message.
  mider version
 ```
 
-## Example
+## EXAMPLE
 ```
  mider version
  mider devices

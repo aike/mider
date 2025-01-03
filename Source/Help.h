@@ -125,10 +125,10 @@ public:
         n = 0x5F; cc1[n] = "Effect 5 Depth";       cc2[n] = "value(0-127)";
         n = 0x60; cc1[n] = "Data Increment";       cc2[n] = "value(0-127)";
         n = 0x61; cc1[n] = "Data Decrement";       cc2[n] = "value(0-127)";
-        n = 0x62; cc1[n] = "NRPN LSB";             cc2[n] = "value(0-127)";
-        n = 0x63; cc1[n] = "NRPN MSB";             cc2[n] = "value(0-127)";
-        n = 0x64; cc1[n] = "RPN LSB";              cc2[n] = "value(0-127)";
-        n = 0x65; cc1[n] = "RPN MSB";              cc2[n] = "value(0-127)";
+        n = 0x62; cc1[n] = "NRPN LSB";             cc2[n] = "LSB(0-127)";
+        n = 0x63; cc1[n] = "NRPN MSB";             cc2[n] = "MSB(0-127)";
+        n = 0x64; cc1[n] = "RPN LSB";              cc2[n] = "LSB(0-127)";
+        n = 0x65; cc1[n] = "RPN MSB";              cc2[n] = "MSB(0-127)";
 
         // Channel Mode Message
         n = 0x78; cc1[n] = "All Sound Off";        cc2[n] = "always zero";
@@ -214,6 +214,7 @@ public:
     std::string ccCommandHelp1(int n);
     int ccCommandNumber(std::string s);
     int ccxCommandNumber(std::string s);
+    std::string miderCommandHelp(std::string cmd);
     int ccxMsbToLsb(int msb);
     std::string ccName(int n);
     std::string toString(std::vector<uint8_t> byte);
@@ -244,6 +245,14 @@ private:
         "System Common Message",
         "System Realtime Message",
         "Not Status Byte"
+    };
+
+    std::map<std::string, std::string> midercmdtext = {
+        {"devices",    "List MIDI devices"},
+        {"indevices",  "List MIDI input devices"},
+        {"outdevices", "List MIDI output devices"},
+        {"receive",    "Launch MIDI receive server"},
+        {"version",    "Show mider version"},
     };
 };
 

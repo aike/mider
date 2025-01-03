@@ -29,13 +29,14 @@ P ArgParser::parse(std::vector<std::string>arg)
 
     std::string arg1Lower = toLower(arg[1]);
 
-    ////// (0) mider ////////
+    ////// mider ////////
     if (arg[1] == "")
     {
         return P::NO_ARGS_HELP;
     }
 
-    ////// (1) mider command ////////
+    ////// mider command ////////
+    ///  ex. mider devices
     else if ((arg1Lower == "version") && (arg[2] == ""))
     {
         return P::SHOWVERSION;
@@ -57,14 +58,16 @@ P ArgParser::parse(std::vector<std::string>arg)
         return P::OUTDEVICE;
     }
 
-    ////// (5) mider device receive ////////
+    ////// mider device receive ////////
+    ///  ex. mider 1 receive
     else if (isInt128(arg[1]) && (arg[2] == "receive") && (arg[3] == ""))
     {
         device = std::stoi(arg[1]);
         return P::DEV_RECEIVE;
     }
 
-    ////// (2) mider device channel command byte1 byte2 ////////
+    ////// mider device channel command [byte1 [byte2]] ////////
+    ///  ex. mider 1 1 noteon 60 100
     else if (isInt128(arg[1]) && isInt1to16(arg[2]) && isAlphabet(arg[3]) && !isAlphabet(arg[4]))
     {
         device = std::stoi(arg[1]);
@@ -138,7 +141,8 @@ P ArgParser::parse(std::vector<std::string>arg)
         return P::DEV_CH_CHANNELVOICEMSG;
     }
 
-    ////// (2) mider device command [byte1 [byte2]] ////////
+    ////// mider device command [byte1 [byte2]] ////////
+    ///  ex. mider 1 TuneRequest
     else if (isInt128(arg[1]) && isAlphabet(arg[2]) && !isInt256(arg[2]) && !isAlphabet(arg[3]))
     {
         device = std::stoi(arg[1]);
@@ -212,7 +216,8 @@ P ArgParser::parse(std::vector<std::string>arg)
         return P::DEV_SYSTEMRTMSG;
     }
 
-    ////// (3) mider device channel "cc" cc_command byte2 ////////
+    ////// mider device channel "cc" cc_command byte2 ////////
+    ///  ex. mider 1 1 CC BankSelect 1
     else if (isInt128(arg[1]) && isInt1to16(arg[2]) && isAlphabet(arg[3]) && isAlphabet(arg[4]))
     {
         device = std::stoi(arg[1]);
@@ -258,7 +263,8 @@ P ArgParser::parse(std::vector<std::string>arg)
         return P::DEV_CH_CC_CHANNELVOICEMSG;
     }
 
-    ////// (4) mider device byte0 byte1 byte2 ////////
+    ////// mider device byte [byte1 ...] ////////
+    ///  ex. mider 1 90h 3Ch 1Eh
     else if (isInt128(arg[1]) && isInt256(arg[2]))
     {
         device = std::stoi(arg[1]);
@@ -277,7 +283,8 @@ P ArgParser::parse(std::vector<std::string>arg)
         return P::DEV_BYTELIST;
     }
 
-    ////// (6) mider help ////////
+    ////// mider help [command ...] ////////
+    ///  ex. mider help
     else if (arg[1] == "help")
     {
         if (arg[2] == "")
@@ -286,15 +293,50 @@ P ArgParser::parse(std::vector<std::string>arg)
         }
         else if (isAlphabet(arg[2]) && arg[3] == "")
         {
-            int n = h.commandNumber(toLower(arg[2]));
+            std::string cmd = toLower(arg[2]);
+            int n = h.commandNumber(cmd);
             if (n < 0)
             {
-                text = arg[2] + " is not a message.";
+                int m = h.ccCommandNumber(cmd);
+                if (m >= 0)
+                {
+                    if (m < 0x78)
+                    {
+                        text = "Control Change Help:\n";
+                        text += "  B0h Control Change | " + h.ccCommandHelp1(m);
+                        return P::HELP_CC_CCNAME;
+                    }
+                    else
+                    {
+                        text = "Channel Mode Message Help:\n";
+                        text += "  B0h Channel Mode | " + h.ccCommandHelp1(m);
+                        return P::HELP_CM_CMNAME;
+                    }
+                }
+                else if (h.ccxCommandNumber(cmd) >= 0)
+                {
+                    m = h.ccxCommandNumber(cmd);
+                    text = "Control Change Help:\n";
+                    text += "  B0h Control Change | " + h.ccCommandHelp1(m);
+                    return P::HELP_CC_CCNAME;
+                }
+                else if (h.miderCommandHelp(cmd) != "")
+                {
+                    text = "Mider Command Help:\n";
+                    text += "  " + h.miderCommandHelp(cmd);
+                    return P::HELP_MIDERCOMMAND;
+                }
+
+                text = arg[2] + " is not a valid keyword.";
                 return P::E_MSGNAME_ERROR;
             }
-            else if (h.commandName(n) == "Control Change")
+            else if ((cmd == "cc") || (cmd == "controlchange"))
             {
                 return P::HELP_CC;
+            }
+            else if ((cmd == "cm") || (cmd == "channelmode"))
+            {
+                return P::HELP_CM;
             }
             return P::HELP_MSGNAME;
         }
@@ -306,10 +348,17 @@ P ArgParser::parse(std::vector<std::string>arg)
                 int m = h.ccCommandNumber(toLower(arg[3]));
                 if (m < 0)
                 {
+                    m = h.ccxCommandNumber(toLower(arg[3]));
+                    if (m >= 0)
+                    {
+                        text = "Control Change Help:\n";
+                        text += "  B0h Control Change | " + h.ccCommandHelp1(m);
+                        return P::HELP_CC_CCNAME;
+                    }
                     text = arg[3] + " is not a control change.";
                     return P::E_CCNAME_ERROR;
                 }
-                else if ((m < 120))
+                else if ((m < 0x78))
                 {
                     text = "Control Change Help:\n";
                     text += "  B0h Control Change | " + h.ccCommandHelp1(m);

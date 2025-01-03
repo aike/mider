@@ -1,13 +1,8 @@
 
 // TODO
 // - help
-// - cc cccommand msb lsbで2メッセージ送信
-// 
-// - receiveで長いコマンドやランニングステータスを受信したときの表示
 // - mac build
-// 
-// - 複数メッセージ送信 NoteOn 60 100 NoteOn 64 100（無駄に複雑になるのでやらない方がいい）
-// - running status
+// - GitHub Release page
 // 
 // - ok cc/cmの省略
 // - ok readme
@@ -16,6 +11,8 @@
 //     F0h 7Dh 01h 02h 03h 04h F7h はOK
 //     SOX 7Dh 01h 02h 03h 04h EOX に対応したい
 // - ok source header comment
+// - ok receiveで長いコマンドやランニングステータスを受信したときの表示
+// - ok cc cccommand msb lsbで2メッセージ送信
 
 
 constexpr auto VERSION = "0.1.0";
@@ -48,7 +45,7 @@ constexpr auto BUFMAX = 4096;
 uint8_t msgbuf[BUFMAX];
 
 /////////// TEST /////////////
-//#define TEST
+#define TEST
 #include "Test.h"
 //////////////////////////////
 

@@ -72,13 +72,21 @@ int main()
 
     // Help Test
     shouldBe({ "mider", "help" }, P::HELP);
+    shouldBe({ "mider", "help", "receive" }, P::HELP_MIDERCOMMAND);
     shouldBe({ "mider", "help", "NoteOn" }, P::HELP_MSGNAME);
     shouldBe({ "mider", "help", "noteon" }, P::HELP_MSGNAME);
     shouldBe({ "mider", "help", "NOTEON" }, P::HELP_MSGNAME);
     shouldBe({ "mider", "help", "no" }, P::HELP_MSGNAME);
     shouldBe({ "mider", "help", "NO" }, P::HELP_MSGNAME);
     shouldBe({ "mider", "help", "CC" }, P::HELP_CC);
-    shouldBe({ "mider", "help", "CC", "BankSelectMSB" }, P::HELP_CC_CCNAME);
+    shouldBe({ "mider", "help", "CC", "BankSelectLSB" }, P::HELP_CC_CCNAME);
+    shouldBe({ "mider", "help", "BankSelectLSB" }, P::HELP_CC_CCNAME);
+    shouldBe({ "mider", "help", "CC", "BankSelect" }, P::HELP_CC_CCNAME);
+    shouldBe({ "mider", "help", "BankSelect" }, P::HELP_CC_CCNAME);
+    shouldBe({ "mider", "help", "CM" }, P::HELP_CM);
+    shouldBe({ "mider", "help", "CC", "AllNotesOff" }, P::HELP_CM_CMNAME);
+    shouldBe({ "mider", "help", "AllNotesOff" }, P::HELP_CM_CMNAME);
+
 
     // Error Test
     shouldBe({ "mider", "1", "1", "NoteOn"}, P::E_SYNTAX_ERROR);

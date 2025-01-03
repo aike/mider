@@ -133,6 +133,16 @@ std::string Help::ccName(int n)
     return "";
 }
 
+std::string Help::miderCommandHelp(std::string s)
+{
+    if (midercmdtext.find(s) != midercmdtext.end())
+    {
+        return midercmdtext[s];
+    }
+    return "";
+}
+
+
 std::string Help::toString(std::vector<uint8_t> byte)
 {
     std::string s = "";
