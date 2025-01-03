@@ -28,7 +28,6 @@ constexpr auto VERSION = "0.1.0";
 #include <vector>
 #include <csignal>
 
-
 #include "Help.h"
 #include "ArgParser.h"
 #include "MidiReceiver.h"
@@ -37,7 +36,6 @@ void usage(void);
 void listInDevices(void);
 void listOutDevices(void);
 void listAllDevices(void);
-//void sendMessage(int device, int channel, int byte0, int byte1, int byte2);
 void sendMessage(int device, std::vector<uint8_t>data);
 void receiveMessage(int device);
 
@@ -92,6 +90,7 @@ int main (int argc, char* argv[])
 
     case P::DEV_CH_CHANNELVOICEMSG:
     case P::DEV_CH_CC_CHANNELVOICEMSG:
+    case P::DEV_CH_CCX_CHANNELVOICEMSG:
     case P::DEV_SYSTEMCOMMONMSG:
     case P::DEV_SYSTEMRTMSG:
     case P::DEV_BYTELIST:

@@ -66,6 +66,24 @@ int Help::ccCommandNumber(std::string s)
     return -1;
 }
 
+int Help::ccxCommandNumber(std::string s)
+{
+    if (ccx_cmd.find(s) != ccx_cmd.end())
+    {
+        return ccx_cmd[s];
+    }
+    return -1;
+}
+
+int Help::ccxMsbToLsb(int msb)
+{
+    if (msb < 0x14)
+    {
+        return msb + 0x20;
+    }
+    return msb - 1;
+}
+
 std::string Help::ccCommandName(int n)
 {
     if (n < 256)
@@ -131,13 +149,25 @@ std::string Help::toString(std::vector<uint8_t> byte)
         if (msgtype == MSG::ChannelVoiceCc)
         {
             int cctype = byte[1];
-            s = "[Control Change] [" + cc1[cctype] + "] [" + cc2[cctype] + ":" + std::to_string(byte[1]) + "]";
+            if (byte.size() == 6)
+            {
+                int val = byte[2] * 0x80 + byte[5];
+                int msb = cctype;
+                int lsb = ccxMsbToLsb(msb);
+                s =   "[Control Change] [" + cc1[msb] + "] [" + cc2[msb] + ":" + std::to_string(byte[2]) + "]\n"
+                    + "           "
+                    + "[Control Change] [" + cc1[lsb] + "] [" + cc2[lsb] + ":" + std::to_string(byte[5]) + "]\n"
+                    + "  value  : MSB * 80h + LSB = " + std::to_string(val);
+                return s;
+            }
+
+            s = "[Control Change] [" + cc1[cctype] + "] [" + cc2[cctype] + ":" + std::to_string(byte[2]) + "]";
             return s;
         }
         else if (msgtype == MSG::ChannelMode)
         {
             int cctype = byte[1];
-            s = "[Channel Mode] [" + cc1[cctype] + "] [" + cc2[cctype] + ":" + std::to_string(byte[1]) + "]";
+            s = "[Channel Mode] [" + cc1[cctype] + "] [" + cc2[cctype] + ":" + std::to_string(byte[2]) + "]";
             return s;
         }
         else if (msgtype == MSG::ChannelVoice)
@@ -162,7 +192,7 @@ std::string Help::toString(std::vector<uint8_t> byte)
                     ss << std::setfill('0') << std::setw(2) << std::hex << std::uppercase << (int)byte[i] << "h";
                 }
             }
-            s = ss.str();            
+            s = ss.str();
         }
         else
         {

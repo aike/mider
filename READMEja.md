@@ -1,23 +1,24 @@
 # mider
-simple command-line MIDI messaging tool
+シンプル・コマンドラインMIDIメッセージ送受信ツール
 
-## Description
-This is a command line tool for testing and controlling MIDI-compatible devices and software.  
-With detailed help and runtime display, you can easily send MIDI messages without referring to the specification documents.  
-Many abbreviations are available, allowing you to execute commands with short inputs.
+# 説明
+MIDI対応機器やMIDI対応ソフトウェアの検証や制御のためのコマンドラインツールです。  
+詳細なヘルプや実行時の表示により、仕様書を参照せずともMIDIメッセージを送信することが簡単にできます。  
+豊富な省略記法が用意されており、短い入力でコマンドを実行することができます。
 
-## FEATURES
-- list MIDI devices
-- send MIDI message to MIDI output device
-- receive MIDI message from MIDI input device
-- support command name / raw bytes parameters
-- support decimal / hex(XXh sytle and 0xXX style) number parameters
-- commands are case-insensitive
-- most commands can use acronyms
 
-## Usage
+## 特徴
+- MIDIデバイス一覧表示
+- MIDI出力デバイスにMIDIメッセージ送信
+- MIDI入力デバイスからMIDIメッセージ受信
+- コマンド名またはバイト列による指定
+- 10進、16進数(XXh表記、0xXX表記)の数値指定
+- コマンド名は大文字小文字を区別しない
+- ほとんどのコマンド名は頭文字による略称指定可能
 
-### Send MIDI Message
+## 記法
+
+### MIDIメッセージ送信
 ```
  mider device channel channel_voice_message_command [byte ...]
  mider device channel "ControlChange" control_change_command byte
@@ -28,26 +29,26 @@ Many abbreviations are available, allowing you to execute commands with short in
  mider device byte [byte ...]
 ```
 
-### Send MIDI Message Extended Syntax for CC MSB/LSB
+### MIDI CC MSB/LSBメッセージ送信のための拡張構文
 ```
  mider device channel "ControlChange" control_change_command MSB LSB
 ```
-Sends a CC MSB message and a CC LSB message.
+CC MSBメッセージと、CC LSBメッセージを送信する。
 
 
-### Launch MIDI Receive Server
+### MIDIメッセージ受信サーバ起動
 ```
  mider device "receive"
 ```
 
-### List MIDI Devices
+### MIDIデバイス一覧表示
 ```
  mider "devices"
  mider "indevices"
  mider "outdevices"
 ```
 
-### Show Help
+### ヘルプ表示
 ```
  mider "help"
  mider "help" command
@@ -57,13 +58,13 @@ Sends a CC MSB message and a CC LSB message.
  mider "help" "ChannelMode" channelmode_command
 ```
 
-### Show Version
+### バージョン表示
 ```
  mider --version
  mider version
 ```
 
-## Example
+## コマンド例
 ```
  mider version
  mider devices
@@ -93,9 +94,9 @@ Sends a CC MSB message and a CC LSB message.
  mider help cm allnotesoff
 ```
 
-## WEBSITE
+## 公式サイト
 http://github.com/aike/mider
 
-## CREDIT
+## クレジット
 mider program is licensed under MIT License.  
 Contact: X @aike1000

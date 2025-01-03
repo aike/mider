@@ -20,6 +20,7 @@ enum P {
     OUTDEVICE,
     DEV_CH_CHANNELVOICEMSG,
     DEV_CH_CC_CHANNELVOICEMSG,
+    DEV_CH_CCX_CHANNELVOICEMSG,
     DEV_CH_CM_CHANNELMODEMSG,
     DEV_SYSTEMCOMMONMSG,
     DEV_SYSTEMRTMSG,
@@ -54,6 +55,7 @@ public:
         ptext[OUTDEVICE] = "OUTDEVICE";
         ptext[DEV_CH_CHANNELVOICEMSG] = "DEV_CH_CHANNELVOICEMSG";
         ptext[DEV_CH_CC_CHANNELVOICEMSG] = "DEV_CH_CC_CHANNELVOICEMSG";
+        ptext[DEV_CH_CCX_CHANNELVOICEMSG] = "DEV_CH_CCX_CHANNELVOICEMSG";
         ptext[DEV_CH_CM_CHANNELMODEMSG] = "DEV_CH_CM_CHANNELMODEMSG";
         ptext[DEV_SYSTEMCOMMONMSG] = "DEV_SYSTEMCOMMONMSG";
         ptext[DEV_SYSTEMRTMSG] = "DEV_SYSTEMRTMSG";
@@ -103,6 +105,6 @@ private:
     int channel = 0;
     std::vector<uint8_t> bytes;
     std::string text;
-    std::string ptext[25];
+    std::string ptext[26];
 
 };

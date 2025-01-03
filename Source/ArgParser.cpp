@@ -93,6 +93,14 @@ P ArgParser::parse(std::vector<std::string>arg)
                     return P::DEV_CH_CM_CHANNELMODEMSG;
                 }
             }
+            else if ((h.ccxCommandNumber(toLower(arg[3])) >= 0) && (getNumber(arg[4]) > 0) && (getNumber(arg[5]) > 0))
+            {
+                byte1 = h.ccxCommandNumber(toLower(arg[3]));
+                int byte2 = getNumber(arg[4]);
+                int byte3 = getNumber(arg[5]);
+                setBytes({ 0xB0 + channel, byte1, byte2, 0xB0 + channel, h.ccxMsbToLsb(byte1), byte3 });
+                return P::DEV_CH_CCX_CHANNELVOICEMSG;
+            }
 
             text = "ERROR: Massage name(" + arg[3] + ") not found.";
             return P::E_MSGNAME_ERROR;
@@ -220,6 +228,14 @@ P ArgParser::parse(std::vector<std::string>arg)
         }
         if (byte1 < 0)
         {
+            if ((h.ccxCommandNumber(toLower(arg[4])) >= 0) && (getNumber(arg[5]) > 0) && (getNumber(arg[6]) > 0))
+            {
+                byte1 = h.ccxCommandNumber(toLower(arg[4]));
+                byte2 = getNumber(arg[5]);
+                int byte3 = getNumber(arg[6]);
+                setBytes({ 0xB0 + channel, byte1, byte2, 0xB0 + channel, h.ccxMsbToLsb(byte1), byte3 });
+                return P::DEV_CH_CCX_CHANNELVOICEMSG;
+            }
             text = "ERROR: CC name(" + arg[4] + ") not found.";
             return P::E_CCNAME_ERROR;
         }

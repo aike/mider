@@ -62,6 +62,13 @@ int main()
     shouldBe({ "mider", "1", "start" }, P::DEV_SYSTEMRTMSG);
     shouldBe({ "mider", "1", "SystemReset" }, P::DEV_SYSTEMRTMSG);
 
+    // Channel Voice Message (CC) Extended Syntax Test
+    shouldBe({ "mider", "1", "1", "CC", "BankSelect", "1", "2" }, P::DEV_CH_CCX_CHANNELVOICEMSG);
+    shouldBe({ "mider", "1", "1", "CC", "NRPN", "1", "2" }, P::DEV_CH_CCX_CHANNELVOICEMSG);
+    shouldBe({ "mider", "1", "1", "CC", "RPN", "1", "2" }, P::DEV_CH_CCX_CHANNELVOICEMSG);
+    shouldBe({ "mider", "1", "1", "BankSelect", "1", "2" }, P::DEV_CH_CCX_CHANNELVOICEMSG);
+    shouldBe({ "mider", "1", "1", "NRPN", "1", "2" }, P::DEV_CH_CCX_CHANNELVOICEMSG);
+    shouldBe({ "mider", "1", "1", "RPN", "1", "2" }, P::DEV_CH_CCX_CHANNELVOICEMSG);
 
     // Help Test
     shouldBe({ "mider", "help" }, P::HELP);
@@ -117,6 +124,14 @@ int main()
     shouldBe({ "mider", "1", "SOX", "1", "2", "3", "4", "EOX" }, { 0xF0, 1, 2, 3, 4, 0xF7 });
     shouldBe({ "mider", "1", "SOX", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "EOX" }, 
                 { 0xF0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 0xF7 });
+
+    // Channel Voice Message (CC) Extended Syntax Test
+    shouldBe({ "mider", "1", "1", "CC", "BankSelect", "1", "2" }, { 0xB0, 0x00, 0x01, 0xB0, 0x20, 0x02 });
+    shouldBe({ "mider", "1", "1", "CC", "NRPN", "1", "2" }, { 0xB0, 0x63, 0x01, 0xB0, 0x62, 0x02 });
+    shouldBe({ "mider", "1", "1", "CC", "RPN", "1", "2" },  { 0xB0, 0x65, 0x01, 0xB0, 0x64, 0x02 });
+    shouldBe({ "mider", "1", "1", "BankSelect", "1", "2" }, { 0xB0, 0x00, 0x01, 0xB0, 0x20, 0x02 });
+    shouldBe({ "mider", "1", "1", "NRPN", "1", "2" }, { 0xB0, 0x63, 0x01, 0xB0, 0x62, 0x02 });
+    shouldBe({ "mider", "1", "1", "RPN", "1", "2" }, { 0xB0, 0x65, 0x01, 0xB0, 0x64, 0x02 });
 
     return 0;
 }

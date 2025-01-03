@@ -140,6 +140,25 @@ public:
         n = 0x7E; cc1[n] = "Mono Mode On";         cc2[n] = "0(Omni On)/number of voices(Omni Off)";
         n = 0x7F; cc1[n] = "Poly Mode On";         cc2[n] = "always zero";
 
+        // Control Changeägí£ç\ï∂
+        n = 0x00; ccx[n] = "Bank Select";
+        n = 0x01; ccx[n] = "Modulation Wheel";
+        n = 0x02; ccx[n] = "Breath Controller";
+        n = 0x04; ccx[n] = "Foot Pedal";
+        n = 0x05; ccx[n] = "Portamento Time";
+        n = 0x06; ccx[n] = "Data Entry";
+        n = 0x07; ccx[n] = "Channel Volume";
+        n = 0x08; ccx[n] = "Balance";
+        n = 0x0A; ccx[n] = "Pan";
+        n = 0x0B; ccx[n] = "Expression";
+        n = 0x0C; ccx[n] = "Effect Controller 1";
+        n = 0x0D; ccx[n] = "Effect Controller 2";
+        n = 0x10; ccx[n] = "General Purpose 1";
+        n = 0x11; ccx[n] = "General Purpose 2";
+        n = 0x12; ccx[n] = "General Purpose 3";
+        n = 0x13; ccx[n] = "General Purpose 4";
+        n = 0x63; ccx[n] = "NRPN";
+        n = 0x65; ccx[n] = "RPN";
 
         // command name to number
         for (n = 0; n < 256; n++)
@@ -166,18 +185,22 @@ public:
         {
             if (cc1[n] != "Undefined")
             {
-                if (cc_cmd.find(toLowerNoSpace(cc1[n])) == cc_cmd.end())
+                cc_cmd[toLowerNoSpace(cc1[n])] = n;
+                if (cc1[n].find(' ') != std::string::npos)
                 {
-                    cc_cmd[toLowerNoSpace(cc1[n])] = n;
+                    cc_cmd[toAbbreviation(cc1[n])] = n;
+                }
 
-                    if (cc1[n].find(' ') != std::string::npos)
+                if ((n < 0x14) || (n == 0x63) || (n == 0x65))
+                {
+                    ccx_cmd[toLowerNoSpace(ccx[n])] = n;
+                    if (ccx[n].find(' ') != std::string::npos)
                     {
-                        cc_cmd[toAbbreviation(cc1[n])] = n;
+                        ccx_cmd[toAbbreviation(ccx[n])] = n;
                     }
                 }
             }
         }
-
     };
 
     ~Help() {};
@@ -190,8 +213,9 @@ public:
     std::string ccCommandHelp(int n);
     std::string ccCommandHelp1(int n);
     int ccCommandNumber(std::string s);
+    int ccxCommandNumber(std::string s);
+    int ccxMsbToLsb(int msb);
     std::string ccName(int n);
-    //std::string toString(int byte0, int byte1, int byte2);
     std::string toString(std::vector<uint8_t> byte);
     MSG getMessageType(std::vector<uint8_t> byte);
     std::string getMessageTypeName(MSG msgtype);
@@ -203,9 +227,11 @@ private:
     std::string byte2[256];
     std::string cc1[256];
     std::string cc2[256];
+    std::string ccx[256];
 
     std::map<std::string, int> cmd;
     std::map<std::string, int> cc_cmd;
+    std::map<std::string, int> ccx_cmd;
 
     std::string toLowerNoSpace(const std::string& in_s);
     std::string toAbbreviation(const std::string& in_s);
