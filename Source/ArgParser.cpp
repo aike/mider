@@ -2,8 +2,7 @@
   ==============================================================================
 
     ArgParser.cpp
-    Created: 28 Dec 2024 3:36:49pm
-    Author:  ai
+    Author:  aike
 
   ==============================================================================
 */
@@ -144,7 +143,32 @@ P ArgParser::parse(std::vector<std::string>arg)
         }
 
         int len = h.getMessageLength(byte0);
-        if (len == 1)
+        if (byte0 == 0xF0)
+        {
+            // SysEx
+            std::vector<int> sysexBytes;
+            sysexBytes.reserve(arg.size() - 2);
+            sysexBytes.push_back(0xF0);
+            for (int i = 3; i < arg.size(); i++)
+            {
+                int b = getNumber(arg[i]);
+
+                if (b < 0)
+                {
+                    if (toLower(arg[i]) == "eox")
+                    {
+                        b = 0xF7;
+                    }
+                    else
+                    {
+                        break;
+                    }
+                }
+                sysexBytes.push_back(b);
+            }
+            setBytes(sysexBytes);
+        }
+        else if (len == 1)
         {
             setBytes({ byte0 });
         }

@@ -145,18 +145,40 @@ std::string Help::toString(std::vector<uint8_t> byte)
             msg = msg & 0xF0;
         }
 
-        switch (len) {
-        case 1:
-            s = "[" + byte0[msg] + "]";
-            break;
-        case 2:
-            s = "[" + byte0[msg] + "] [" + byte1[msg] + ":" + std::to_string(byte[1]) + "]";
-            break;
-        case 3:
-            s = "[" + byte0[msg] + "] [" + byte1[msg] + ":" + std::to_string(byte[1]) + "] [" + byte2[msg] + ":" + std::to_string(byte[2]) + "]";
-            break;
-        default:
-            break;
+        if (byte[0] == 0xF0)
+        {
+            // SysEx
+            std::stringstream ss;
+            ss << "[SOX]";
+            for (int i = 1; i < byte.size(); i++)
+            {
+                ss << " ";
+                if ((i == byte.size() - 1) && (byte[i] == 0xF7))
+                {
+                    ss << "[EOX]";
+                }
+                else
+                {
+                    ss << std::setfill('0') << std::setw(2) << std::hex << std::uppercase << (int)byte[i] << "h";
+                }
+            }
+            s = ss.str();            
+        }
+        else
+        {
+            switch (len) {
+            case 1:
+                s = "[" + byte0[msg] + "]";
+                break;
+            case 2:
+                s = "[" + byte0[msg] + "] [" + byte1[msg] + ":" + std::to_string(byte[1]) + "]";
+                break;
+            case 3:
+                s = "[" + byte0[msg] + "] [" + byte1[msg] + ":" + std::to_string(byte[1]) + "] [" + byte2[msg] + ":" + std::to_string(byte[2]) + "]";
+                break;
+            default:
+                break;
+            }
         }
     }
     return s;

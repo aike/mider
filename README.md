@@ -6,7 +6,7 @@ simple command-line MIDI messaging tool
 - send MIDI message to MIDI output device
 - receive MIDI message from MIDI input device
 - support command name / raw bytes parameters
-- support decimal/hex number parameters
+- support decimal / hex(XXh sytle and 0xXX style) number parameters
 - commands are case-insensitive
 - most commands can use acronyms
 
@@ -19,6 +19,7 @@ simple command-line MIDI messaging tool
  mider device channel "ChannelMode" channel_mode_message_command byte
  mider device system_common_message_command [byte ...]
  mider device system_realtime_message_command [byte ...]
+ mider device byte "SOX" [byte ...] "EOX"
  mider device byte [byte ...]
 ```
 
@@ -47,6 +48,7 @@ simple command-line MIDI messaging tool
 ### Show Version
 ```
  mider --version
+ mider version
 ```
 
 ## Example
@@ -55,8 +57,8 @@ simple command-line MIDI messaging tool
  mider devices
  mider 1 receive
  mider 1 1 NoteOn 60 100
- mider 1 1 noteon 3ch 64h
- mider 1 90h 3ch 64h
+ mider 1 1 noteon 0x3C 0x64
+ mider 1 90h 3Ch 64h
  mider 1 16 ControlChange BankSelectMSB 10
  mider 1 16 CC BankSelectMSB 10
  mider 1 16 BankSelectMSB 10
@@ -67,6 +69,7 @@ simple command-line MIDI messaging tool
  mider 1 5 ANO 0
  mider 1 TuneRequest
  mider 1 Start
+ mider 1 SOX 7Dh 01h 02h 03h 04h EOX
  mider help
  mider help noteon
  mider help cc

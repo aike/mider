@@ -2,8 +2,7 @@
   ==============================================================================
 
     Test.h
-    Created: 29 Dec 2024 2:49:33pm
-    Author:  ai
+    Author:  aike
 
   ==============================================================================
 */
@@ -56,6 +55,8 @@ int main()
 
     // System Common Message Test
     shouldBe({ "mider", "1", "TuneRequest" }, P::DEV_SYSTEMCOMMONMSG);
+    shouldBe({ "mider", "1", "SOX", "1", "2", "3", "4", "EOX" }, P::DEV_SYSTEMCOMMONMSG);
+    shouldBe({ "mider", "1", "SOX", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "EOX" }, P::DEV_SYSTEMCOMMONMSG);
 
     // System Realtime Message Test
     shouldBe({ "mider", "1", "start" }, P::DEV_SYSTEMRTMSG);
@@ -111,6 +112,11 @@ int main()
     // Byte List
     shouldBe({ "mider", "1", "2", "3", "4", "5", "6" }, { 2, 3, 4, 5, 6 });
     shouldBe({ "mider", "0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11"}, {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11});
+
+    // SysEx
+    shouldBe({ "mider", "1", "SOX", "1", "2", "3", "4", "EOX" }, { 0xF0, 1, 2, 3, 4, 0xF7 });
+    shouldBe({ "mider", "1", "SOX", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "EOX" }, 
+                { 0xF0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 0xF7 });
 
     return 0;
 }
