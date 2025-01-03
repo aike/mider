@@ -83,7 +83,7 @@ P ArgParser::parse(std::vector<std::string>arg)
                 if (byte2 < 0)
                 {
                     text = "ERROR: Argument syntax error.\n";
-                    text += "  " + h.ccCommandHelp1(byte1);
+                    text += "  " + h.ccCommandHelp(byte1);
                     return P::E_SYNTAX_ERROR;
                 }
                 setBytes({ 0xB0 + channel, byte1, byte2 });
@@ -120,7 +120,7 @@ P ArgParser::parse(std::vector<std::string>arg)
             if (byte1 < 0)
             {
                 text = "ERROR: Argument syntax error.\n";
-                text += "  " + h.commandHelp1(byte0);
+                text += "  " + h.commandHelp(byte0);
                 return P::E_SYNTAX_ERROR;
             }
             setBytes({ byte0 + channel, byte1 });
@@ -132,7 +132,7 @@ P ArgParser::parse(std::vector<std::string>arg)
             if ((byte1 < 0) || (byte2 < 0))
             {
                 text = "ERROR: Argument syntax error.\n";
-                text += "  " + h.commandHelp1(byte0);
+                text += "  " + h.commandHelp(byte0);
                 return P::E_SYNTAX_ERROR;
             }
             setBytes({ byte0 + channel, byte1, byte2 });
@@ -190,7 +190,7 @@ P ArgParser::parse(std::vector<std::string>arg)
             if (byte1 < 0)
             {
                 text = "ERROR: Argument syntax error.\n";
-                text += "  " + h.commandHelp1(byte0);
+                text += "  " + h.commandHelp(byte0);
                 return P::E_SYNTAX_ERROR;
             }
             setBytes({ byte0, byte1 });
@@ -202,7 +202,7 @@ P ArgParser::parse(std::vector<std::string>arg)
             if ((byte1 < 0) || (byte2 < 0))
             {
                 text = "ERROR: Argument syntax error.\n";
-                text += "  " + h.commandHelp1(byte0);
+                text += "  " + h.commandHelp(byte0);
                 return P::E_SYNTAX_ERROR;
             }
             setBytes({ byte0, byte1, byte2 });
@@ -302,28 +302,24 @@ P ArgParser::parse(std::vector<std::string>arg)
                 {
                     if (m < 0x78)
                     {
-                        text = "Control Change Help:\n";
-                        text += "  B0h Control Change | " + h.ccCommandHelp1(m);
+                        text = h.ccCommandHelp(m);
                         return P::HELP_CC_CCNAME;
                     }
                     else
                     {
-                        text = "Channel Mode Message Help:\n";
-                        text += "  B0h Channel Mode | " + h.ccCommandHelp1(m);
+                        text = h.ccCommandHelp(m);
                         return P::HELP_CM_CMNAME;
                     }
                 }
                 else if (h.ccxCommandNumber(cmd) >= 0)
                 {
                     m = h.ccxCommandNumber(cmd);
-                    text = "Control Change Help:\n";
-                    text += "  B0h Control Change | " + h.ccCommandHelp1(m);
+                    text = h.ccxCommandHelp(m);
                     return P::HELP_CC_CCNAME;
                 }
                 else if (h.miderCommandHelp(cmd) != "")
                 {
-                    text = "Mider Command Help:\n";
-                    text += "  " + h.miderCommandHelp(cmd);
+                    text = h.miderCommandHelp(cmd);
                     return P::HELP_MIDERCOMMAND;
                 }
 
@@ -338,6 +334,7 @@ P ArgParser::parse(std::vector<std::string>arg)
             {
                 return P::HELP_CM;
             }
+            text = h.commandHelp(n);
             return P::HELP_MSGNAME;
         }
         else if (isAlphabet(arg[2]) && isAlphabet(arg[3]))
@@ -351,8 +348,7 @@ P ArgParser::parse(std::vector<std::string>arg)
                     m = h.ccxCommandNumber(toLower(arg[3]));
                     if (m >= 0)
                     {
-                        text = "Control Change Help:\n";
-                        text += "  B0h Control Change | " + h.ccCommandHelp1(m);
+                        text = h.ccxCommandHelp(m);
                         return P::HELP_CC_CCNAME;
                     }
                     text = arg[3] + " is not a control change.";
@@ -360,14 +356,12 @@ P ArgParser::parse(std::vector<std::string>arg)
                 }
                 else if ((m < 0x78))
                 {
-                    text = "Control Change Help:\n";
-                    text += "  B0h Control Change | " + h.ccCommandHelp1(m);
+                    text = h.ccCommandHelp(m);
                     return P::HELP_CC_CCNAME;
                 }
                 else
                 {
-                    text = "Channel Mode Message Help:\n";
-                    text += "  B0h Channel Mode | " + h.ccCommandHelp1(m);
+                    text = h.ccCommandHelp(m);
                     return P::HELP_CM_CMNAME;
                 }
             }

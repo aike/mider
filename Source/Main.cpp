@@ -35,7 +35,7 @@ void listOutDevices(void);
 void listAllDevices(void);
 void sendMessage(int device, std::vector<uint8_t>data);
 void receiveMessage(int device);
-
+void help(P htype);
 
 Help h;
 ArgParser parser;
@@ -45,7 +45,7 @@ constexpr auto BUFMAX = 4096;
 uint8_t msgbuf[BUFMAX];
 
 /////////// TEST /////////////
-#define TEST
+//#define TEST
 #include "Test.h"
 //////////////////////////////
 
@@ -102,17 +102,21 @@ int main (int argc, char* argv[])
         usage();
         break;
     case P::HELP:
-        break;
+    case P::HELP_MIDERCOMMAND:
     case P::HELP_MSGNAME:
-        break;
+    case P::HELP_CC:
     case P::HELP_CC_CCNAME:
+    case P::HELP_CM:
+    case P::HELP_CM_CMNAME:
+        help(state);
         break;
 
     case P::E_SYNTAX_ERROR:
     case P::E_MSGNAME_ERROR:
     case P::E_CCNAME_ERROR:
     case P::E_ARG_ERROR:
-        std::cerr << parser.getText();
+    case P::E_MSGBUF_ERROR:
+        std::cerr << parser.getText() << std::endl;
         return state - P::ERROR;
         break;
     default:
@@ -123,36 +127,6 @@ int main (int argc, char* argv[])
 }
 #endif
 
-
-void usage(void)
-{
-    std::cout << std::endl;
-    std::cout << "Usage:" << std::endl;
-    std::cout << "    (1) mider \"devices\"" << std::endl;
-    std::cout << "    (2) mider device_number channel_number message_name [byte1] [byte2]" << std::endl;
-    std::cout << "    (3) mider device_number channel_number \"CC\" cc_name [byte2]" << std::endl;
-    std::cout << "    (4) mider device_number byte0 byte1 byte2" << std::endl;
-    std::cout << "    (5) mider \"help\"" << std::endl;
-    std::cout << "        mider \"help\" message_name" << std::endl;
-    std::cout << "        mider \"help\" \"CC\"" << std::endl;
-    std::cout << "        mider \"help\" \"CC\" cc_name" << std::endl;
-    std::cout << std::endl;
-    std::cout << "Example:" << std::endl;
-    std::cout << "    mider devices" << std::endl;
-    std::cout << "    mider 1 1 NoteOn 60 100" << std::endl;
-    std::cout << "    mider 1 1 ControlChange DamperPedal 0" << std::endl;
-    std::cout << "    mider 1 1 CC AllNotesOff" << std::endl;
-    std::cout << "    mider 1 1 cc ano" << std::endl;
-    std::cout << "    mider 1 144 60 100" << std::endl;
-    std::cout << "    mider 1 90h 3Ch 64h" << std::endl;
-    std::cout << "    mider 1 0x90 0x3C 0x64" << std::endl;
-    std::cout << std::endl;
-    std::cout << "    mider help" << std::endl;
-    std::cout << "    mider help NoteOn" << std::endl;
-    std::cout << "    mider help CC" << std::endl;
-    std::cout << "    mider help CC AllNotesOff" << std::endl;
-    std::cout << std::endl;
-}
 
 void listInDevices(void)
 {
@@ -267,3 +241,126 @@ void receiveMessage(int device)
     exit(0);
 }
 
+void usage(void)
+{
+    std::cout << std::endl;
+    std::cout << "Usage:" << std::endl;
+    std::cout << "    (1) mider \"devices\"" << std::endl;
+    std::cout << "    (2) mider device_number channel_number message_name [byte1] [byte2]" << std::endl;
+    std::cout << "    (3) mider device_number channel_number \"CC\" cc_name [byte2]" << std::endl;
+    std::cout << "    (4) mider device_number byte0 byte1 byte2" << std::endl;
+    std::cout << "    (5) mider \"help\"" << std::endl;
+    std::cout << "        mider \"help\" message_name" << std::endl;
+    std::cout << "        mider \"help\" \"CC\"" << std::endl;
+    std::cout << "        mider \"help\" \"CC\" cc_name" << std::endl;
+    std::cout << std::endl;
+    std::cout << "Example:" << std::endl;
+    std::cout << "    mider devices" << std::endl;
+    std::cout << "    mider 1 1 NoteOn 60 100" << std::endl;
+    std::cout << "    mider 1 1 ControlChange DamperPedal 0" << std::endl;
+    std::cout << "    mider 1 1 CC AllNotesOff" << std::endl;
+    std::cout << "    mider 1 1 cc ano" << std::endl;
+    std::cout << "    mider 1 144 60 100" << std::endl;
+    std::cout << "    mider 1 90h 3Ch 64h" << std::endl;
+    std::cout << "    mider 1 0x90 0x3C 0x64" << std::endl;
+    std::cout << std::endl;
+    std::cout << "    mider help" << std::endl;
+    std::cout << "    mider help NoteOn" << std::endl;
+    std::cout << "    mider help CC" << std::endl;
+    std::cout << "    mider help CC AllNotesOff" << std::endl;
+    std::cout << std::endl;
+}
+
+void help(P htype)
+{
+    switch (htype)
+    {
+    case P::HELP:
+        std::cout << std::endl;
+        std::cout << "Message Help:" << std::endl;
+        for (int i = 0; i < 256; i++)
+        {
+            if (i == 0x80)
+            {
+                std::cout << "  Channel Voice Message:" << std::endl;
+            }
+            else if (i == 0xF0)
+            {
+                std::cout << "  Channel Mode Message:" << std::endl;
+                for (int j = 0x78; j < 0x80; j++)
+                {
+                    if (h.ccCommandName(j) != "Undefined")
+                    {
+                        std::cout << "    B0h Channel Mode Message    | " << h.ccCommandHelp(j, 21) << std::endl;
+                    }
+                }
+
+                std::cout << "  System Common Message:" << std::endl;
+            }
+            else if (i == 0xF8)
+            {
+                std::cout << "  System Realtime Message:" << std::endl;
+            }
+            if (h.commandName(i) != "Undefined")
+            {
+                std::cout << "    " << h.commandHelp(i, 23, 26) << std::endl;
+            }
+        }
+        std::cout << std::endl;
+        break;
+
+    case P::HELP_MIDERCOMMAND:
+        std::cout << std::endl;
+        std::cout << "Mider Command Help:" << std::endl;
+        std::cout << "  " << parser.getText() << std::endl;
+        std::cout << std::endl;
+        break;
+    case P::HELP_MSGNAME:
+        std::cout << std::endl;
+        std::cout << "Message Help:" << std::endl;
+        std::cout << "  " << parser.getText() << std::endl;
+        std::cout << std::endl;
+        break;
+
+    case P::HELP_CC:
+        std::cout << std::endl;
+        std::cout << "Control Change Help:" << std::endl;
+        for (int i = 0; i < 0x78; i++)
+        {
+            if (h.ccCommandName(i) != "Undefined")
+            {
+                std::cout << "  B0h Control Change | " << h.ccCommandHelp(i, 31) << std::endl;
+            }
+        }
+        std::cout << std::endl;
+        break;
+
+    case P::HELP_CC_CCNAME:
+        std::cout << std::endl;
+        std::cout << "Control Change Help:" << std::endl;
+        std::cout << "  B0h Control Change | " << parser.getText() << std::endl;
+        std::cout << std::endl;
+        break;
+
+    case P::HELP_CM:
+        std::cout << std::endl;
+        std::cout << "Channel Mode Message Help:" << std::endl;
+        for (int i = 0x78; i < 0x80; i++)
+        {
+            if (h.ccCommandName(i) != "Undefined")
+            {
+                std::cout << "  B0h Channel Mode Message | " << h.ccCommandHelp(i, 21) << std::endl;
+            }
+        }
+        std::cout << std::endl;
+        break;
+
+    case P::HELP_CM_CMNAME:
+        std::cout << std::endl;
+        std::cout << "Channel Mode Message Help:" << std::endl;
+        std::cout << "  B0h Channel Mode | " << parser.getText() << std::endl;
+        std::cout << std::endl;
+        break;
+
+    }
+}

@@ -42,7 +42,7 @@ public:
         n = 0x80;  byte0[n] = "Note Off";                byte1[n] = "note number(0-127)";     byte2[n] = "velocity(0-127)";
         n = 0x90;  byte0[n] = "Note On";                 byte1[n] = "note number(0-127)";     byte2[n] = "velocity(0-127)";
         n = 0xA0;  byte0[n] = "Polyphonic Key Pressure"; byte1[n] = "note number(0-127)";     byte2[n] = "pressure(0-127)";
-        n = 0xB0;  byte0[n] = "Control Change";          byte1[n] = "control number(0-127)";  byte2[n] = "control value(0-127)";
+        n = 0xB0;  byte0[n] = "Control Change";          byte1[n] = "control number(0-119)";  byte2[n] = "control value(0-127)";
         n = 0xC0;  byte0[n] = "Program Change";          byte1[n] = "program number(0-127)";  byte2[n] = "-";
         n = 0xD0;  byte0[n] = "Channel Pressure";        byte1[n] = "note number(0-127)";     byte2[n] = "pressure(0-127)";
         n = 0xE0;  byte0[n] = "Pitch Bend Change";       byte1[n] = "LSB(0-127)";             byte2[n] = "MSB(0-127)";
@@ -206,12 +206,11 @@ public:
     ~Help() {};
 
     std::string commandName(int n);
-    std::string commandHelp(int n);
-    std::string commandHelp1(int n);
+    std::string commandHelp(int n, int width1=-1, int width2=-1);
     int commandNumber(std::string s);
     std::string ccCommandName(int n);
-    std::string ccCommandHelp(int n);
-    std::string ccCommandHelp1(int n);
+    std::string ccCommandHelp(int n, int width=-1);
+    std::string ccxCommandHelp(int n);
     int ccCommandNumber(std::string s);
     int ccxCommandNumber(std::string s);
     std::string miderCommandHelp(std::string cmd);

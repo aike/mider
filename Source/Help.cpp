@@ -26,24 +26,13 @@ std::string Help::commandName(int n)
     return "";
 }
 
-std::string Help::commandHelp(int n)
+std::string Help::commandHelp(int n, int width1, int width2)
 {
     if (n < 256)
     {
         std::stringstream hex;
         hex << std::setfill('0') << std::setw(2) << std::hex << std::uppercase << n << "h";
-        return hex.str() + " " + fmt(byte0[n], 23) + "| " + fmt(byte1[n], 21) + "| " + byte2[n];
-    }
-    return "";
-}
-
-std::string Help::commandHelp1(int n)
-{
-    if (n < 256)
-    {
-        std::stringstream hex;
-        hex << std::setfill('0') << std::setw(2) << std::hex << std::uppercase << n << "h";
-        return hex.str() + " " + byte0[n] + " | " + byte1[n] + " | " + byte2[n];
+        return hex.str() + " " + fmt(byte0[n], width1) + " | " + fmt(byte1[n], width2) + "| " + byte2[n];
     }
     return "";
 }
@@ -94,34 +83,32 @@ std::string Help::ccCommandName(int n)
 }
 
 
-std::string Help::ccCommandHelp(int n)
+std::string Help::ccCommandHelp(int n, int width)
 {
     if (n < 256)
     {
         std::stringstream hex;
         hex << std::setfill('0') << std::setw(2) << std::hex << std::uppercase << n << "h";
-        return hex.str() + " " + fmt(cc1[n], 31) + "| " + cc2[n];
+        return hex.str() + " " + fmt(cc1[n], width) + " | " + cc2[n];
     }
     return "";
 }
 
-std::string Help::ccCommandHelp1(int n)
+std::string Help::ccxCommandHelp(int n)
 {
     if (n < 256)
     {
-        std::stringstream hex;
-        hex << std::setfill('0') << std::setw(2) << std::hex << std::uppercase << n << "h";
-        std::string s = hex.str();
-        if (n <= 0x13)
-        {
-            std::stringstream hex2;
-            hex2 << std::setfill('0') << std::setw(2) << std::hex << std::uppercase << (n + 0x20) << "h";
-            s += "/" + hex2.str();
-        }
-        return s + " " + cc1[n] + " | " + cc2[n];
+        std::stringstream hex1;
+        std::stringstream hex2;
+        hex1 << std::setfill('0') << std::setw(2) << std::hex << std::uppercase << n << "h";
+        hex2 << std::setfill('0') << std::setw(2) << std::hex << std::uppercase << ccxMsbToLsb(n) << "h";
+        std::string s = hex1.str() + "/" + hex2.str() + " " + ccx[n] + " | " + "MSB/LSB(0-127)";
+
+        return s;
     }
     return "";
 }
+
 
 std::string Help::ccName(int n)
 {
@@ -315,7 +302,7 @@ std::string Help::toAbbreviation(const std::string& in_s)
 
 std::string Help::fmt(std::string s, int width)
 {
-    if (s.size() < width)
+    if ((int)s.size() < width)
     {
         return s + std::string(width - s.size(), ' ');
     }
