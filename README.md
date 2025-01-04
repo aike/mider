@@ -7,6 +7,9 @@ With detailed help and runtime display, you can easily send MIDI messages withou
 Many abbreviations are available, allowing you to execute commands with short inputs.  
 Not support MIDI 2.0.
 
+## DOWNLOAD
+https://github.com/aike/mider/releases
+
 ## FEATURES
 - list MIDI devices
 - send MIDI message to MIDI output device
@@ -61,6 +64,30 @@ Send a CC MSB message and a CC LSB message.
  mider version
 ```
 
+## SCREENSHOT
+
+### List Devices
+![ss1](ss1.png)
+
+### Send MIDI Message to Output Device 4 Channel 1
+![ss2](ss2.png)
+
+### Receive MIDI Message from Input Device 3
+![ss3](ss3.png)
+
+### Help
+![ss4](ss4.png)
+
+### Help of MIDI Messages
+![ss5](ss5.png)
+
+### Help of MIDI NoteOn Message
+![ss6](ss6.png)
+
+### Help of MIDI CC Messages
+![ss7](ss7.png)
+
+
 ## EXAMPLE
 ```
  mider version
@@ -90,9 +117,6 @@ Send a CC MSB message and a CC LSB message.
  mider help cm
  mider help cm allnotesoff
 ```
-
-## DOWNLOAD
-https://github.com/aike/mider/releases
 
 ## BUILD
 1. Open the mider.jucer file in JUCE Projucer application.
