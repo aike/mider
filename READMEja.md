@@ -7,6 +7,8 @@ MIDI対応機器やMIDI対応ソフトウェアの検証や制御のためのコマンドラインツールです。
 豊富な省略記法が用意されており、短い入力でコマンドを実行することができます。  
 MIDI2.0には対応していません。
 
+## ダウンロード
+https://github.com/aike/mider/releases
 
 ## 特徴
 - MIDIデバイス一覧表示
@@ -61,6 +63,30 @@ CC MSBメッセージと、CC LSBメッセージを送信する。
   mider version
 ```
 
+## スクリーンショット
+
+### デバイス一覧表示
+![ss1](ss1.png)
+
+### 出力デバイス4チャンネル1にNoteOnメッセージ送信
+![ss2](ss2.png)
+
+### 入力デバイス3のメッセージ受信サーバ起動
+![ss3](ss3.png)
+
+### ヘルプ表示
+![ss4](ss4.png)
+
+### MIDIメッセージヘルプ一覧表示
+![ss5](ss5.png)
+
+### MIDI NoteOnメッセージヘルプ表示
+![ss6](ss6.png)
+
+### MIDI CCヘルプ一覧表示
+![ss7](ss7.png)
+
+
 ## コマンド例
 ```
  mider version
@@ -90,9 +116,6 @@ CC MSBメッセージと、CC LSBメッセージを送信する。
  mider help cm
  mider help cm allnotesoff
 ```
-## ダウンロード
-https://github.com/aike/mider/releases
-
 ## ビルド方法
 1. mider.jucerをJUCEのProjucerで開く
 2. IDE(Visual Studio / Xcode)用のプロジェクトファイルを生成する
