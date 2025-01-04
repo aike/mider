@@ -18,49 +18,46 @@ Not support MIDI 2.0.
 
 ## Usage
 
-### Send MIDI Message
+### List MIDI Devices
 ```
- mider device channel channel_voice_message_command [byte ...]
- mider device channel "ControlChange" control_change_command byte
- mider device channel "ChannelMode" channel_mode_message_command byte
- mider device system_common_message_command [byte ...]
- mider device system_realtime_message_command [byte ...]
- mider device byte "SOX" [byte ...] "EOX"
- mider device byte [byte ...]
+  mider [devices|indevices|outdevices]
 ```
 
-### Send MIDI Message Extended Syntax for CC MSB/LSB
+### Send MIDI Message
 ```
- mider device channel "ControlChange" control_change_command MSB LSB
+  mider <dev_no> <ch_no> <message_name> [byte ...]
+  mider <dev_no> <message_name> [byte ...]
+  mider <device> <ch_no> channelmode <channelmode_message_name> <byte>
+  mider <device> <ch_no> controlchange <controlchange_name> <byte>
+  mider <dev_no> sox [byte ...] eox
+  mider <dev_no> <byte> [byte ...]
 ```
-Sends a CC MSB message and a CC LSB message.
+
+### Extended Syntax for Sending CC MSB/LSB Message
+```
+  mider <dev_no> <ch_no> controlchange <controlchange_name> <msb> <lsb>
+```
+Send a CC MSB message and a CC LSB message.
 
 
 ### Launch MIDI Receive Server
 ```
- mider device "receive"
-```
-
-### List MIDI Devices
-```
- mider "devices"
- mider "indevices"
- mider "outdevices"
+  mider <dev_no> receive
 ```
 
 ### Show Help
 ```
- mider "help"
- mider "help" command
- mider "help" "ControlChange"
- mider "help" "ControlChange" controlchange_command
- mider "help" "ChannelMode"
- mider "help" "ChannelMode" channelmode_command
+  mider help
+  mider help <message_name>
+  mider help controlchange
+  mider help controlchange <controlchange_name>
+  mider help channelmode
+  mider help channelmode <channelmode_message_name>
+  mider help [receive|devices|indevices|outdevices|version]
 ```
 
 ### Show Version
 ```
- mider --version
  mider version
 ```
 
@@ -93,6 +90,11 @@ Sends a CC MSB message and a CC LSB message.
  mider help cm
  mider help cm allnotesoff
 ```
+
+## BUILD
+1. Open the mider.jucer file in JUCE Projucer application.
+2. Generate the project files for your IDE (Visual Studio / Xcode).
+3. Open the generated project in your IDE and build the project.
 
 ## WEBSITE
 http://github.com/aike/mider

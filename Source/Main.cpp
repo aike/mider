@@ -1,21 +1,9 @@
+// mider
+//   Description: simple command-line MIDI messaging tool
+//   Author: aike
+//   License: MIT
 
-// TODO
-// - help
-// - mac build
-// - GitHub Release page
-// 
-// - ok cc/cmの省略
-// - ok readme
-// - ok sysex
-//     SysExの message; 表示を data;01h 02h 03h .. としたい
-//     F0h 7Dh 01h 02h 03h 04h F7h はOK
-//     SOX 7Dh 01h 02h 03h 04h EOX に対応したい
-// - ok source header comment
-// - ok receiveで長いコマンドやランニングステータスを受信したときの表示
-// - ok cc cccommand msb lsbで2メッセージ送信
-
-
-constexpr auto VERSION = "0.1.0";
+constexpr auto VERSION = "1.0.0";
 
 #include <JuceHeader.h>
 #include <regex>
@@ -48,7 +36,6 @@ uint8_t msgbuf[BUFMAX];
 //#define TEST
 #include "Test.h"
 //////////////////////////////
-
 
 // Ctrl+Cを検知したときにtrueにするフラグ
 volatile std::sig_atomic_t keepRunning = 1;
@@ -244,30 +231,62 @@ void receiveMessage(int device)
 void usage(void)
 {
     std::cout << std::endl;
+    std::cout << "mider ver " << VERSION << std::endl;
+    std::cout << "  simple command-line MIDI messaging tool" << std::endl;
+    std::cout << std::endl;
     std::cout << "Usage:" << std::endl;
-    std::cout << "    (1) mider \"devices\"" << std::endl;
-    std::cout << "    (2) mider device_number channel_number message_name [byte1] [byte2]" << std::endl;
-    std::cout << "    (3) mider device_number channel_number \"CC\" cc_name [byte2]" << std::endl;
-    std::cout << "    (4) mider device_number byte0 byte1 byte2" << std::endl;
-    std::cout << "    (5) mider \"help\"" << std::endl;
-    std::cout << "        mider \"help\" message_name" << std::endl;
-    std::cout << "        mider \"help\" \"CC\"" << std::endl;
-    std::cout << "        mider \"help\" \"CC\" cc_name" << std::endl;
+    std::cout << "  List MIDI Devices:" << std::endl;
+    std::cout << "    mider [devices|indevices|outdevices]" << std::endl;
     std::cout << std::endl;
-    std::cout << "Example:" << std::endl;
-    std::cout << "    mider devices" << std::endl;
-    std::cout << "    mider 1 1 NoteOn 60 100" << std::endl;
-    std::cout << "    mider 1 1 ControlChange DamperPedal 0" << std::endl;
-    std::cout << "    mider 1 1 CC AllNotesOff" << std::endl;
-    std::cout << "    mider 1 1 cc ano" << std::endl;
-    std::cout << "    mider 1 144 60 100" << std::endl;
-    std::cout << "    mider 1 90h 3Ch 64h" << std::endl;
-    std::cout << "    mider 1 0x90 0x3C 0x64" << std::endl;
+    std::cout << "  Send MIDI Message:" << std::endl;
+    std::cout << "    mider <dev_no> <ch_no> <message_name> [byte ...]" << std::endl;
+    std::cout << "    mider <dev_no> <message_name> [byte ...]" << std::endl;
+    std::cout << "    mider <device> <ch_no> channelmode <channelmode_message_name> <byte>" << std::endl;
+    std::cout << "    mider <device> <ch_no> controlchange <controlchange_name> <byte>" << std::endl;
+    std::cout << "    mider <dev_no> <ch_no> controlchange <controlchange_name> <msb> <lsb>" << std::endl;
+    std::cout << "    mider <dev_no> sox [byte ...] eox" << std::endl;
+    std::cout << "    mider <dev_no> <byte> [byte ...]" << std::endl;
     std::cout << std::endl;
+    std::cout << "  Receive MIDI Message:" << std::endl;
+    std::cout << "    mider <dev_no> receive" << std::endl;
+    std::cout << std::endl;
+    std::cout << "  Show Help:" << std::endl;
+    std::cout << "    mider version" << std::endl;
     std::cout << "    mider help" << std::endl;
-    std::cout << "    mider help NoteOn" << std::endl;
-    std::cout << "    mider help CC" << std::endl;
-    std::cout << "    mider help CC AllNotesOff" << std::endl;
+    std::cout << "    mider help <message_name>" << std::endl;
+    std::cout << "    mider help controlchange" << std::endl;
+    std::cout << "    mider help controlchange <controlchange_name>" << std::endl;
+    std::cout << "    mider help channelmode" << std::endl;
+    std::cout << "    mider help channelmode <channelmode_message_name>" << std::endl;
+    std::cout << "    mider help [receive|devices|indevices|outdevices|version]" << std::endl;
+    std::cout << std::endl;
+    std::cout << "  Example:" << std::endl;
+    std::cout << "    mider version" << std::endl;
+    std::cout << "    mider devices" << std::endl;
+    std::cout << "    mider 1 receive" << std::endl;
+    std::cout << "    mider 1 1 NoteOn 60 100" << std::endl;
+    std::cout << "    mider 1 1 noteon 0x3C 0x64" << std::endl;
+    std::cout << "    mider 1 90h 3Ch 64h" << std::endl;
+    std::cout << "    mider 1 16 ControlChange BankSelectMSB 10" << std::endl;
+    std::cout << "    mider 1 16 CC BankSelectMSB 10" << std::endl;
+    std::cout << "    mider 1 16 BankSelectMSB 10" << std::endl;
+    std::cout << "    mider 1 16 BSM 10" << std::endl;
+    std::cout << "    mider 1 16 CC BankSelect 10 20" << std::endl;
+    std::cout << "    mider 1 16 BankSelect 10 20" << std::endl;
+    std::cout << "    mider 1 16 BS 10 20 " << std::endl;
+    std::cout << "    mider 1 5 ChannelMode AllNotesOff 0" << std::endl;
+    std::cout << "    mider 1 5 CM AllNotesOff 0" << std::endl;
+    std::cout << "    mider 1 5 AllNotesOff 0" << std::endl;
+    std::cout << "    mider 1 5 ANO 0" << std::endl;
+    std::cout << "    mider 1 TuneRequest" << std::endl;
+    std::cout << "    mider 1 Start" << std::endl;
+    std::cout << "    mider 1 SOX 7Dh 01h 02h 03h 04h EOX" << std::endl;
+    std::cout << "    mider help" << std::endl;
+    std::cout << "    mider help noteon" << std::endl;
+    std::cout << "    mider help cc" << std::endl;
+    std::cout << "    mider help cc bankselect" << std::endl;
+    std::cout << "    mider help cm" << std::endl;
+    std::cout << "    mider help cm allnotesoff" << std::endl;
     std::cout << std::endl;
 }
 

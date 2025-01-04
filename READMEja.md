@@ -17,52 +17,48 @@ MIDI2.0には対応していません。
 - コマンド名は大文字小文字を区別しない
 - ほとんどのコマンド名は頭文字による略称指定可能
 
-## 記法
+## 使用方法
+
+### MIDIデバイス一覧表示
+```
+  mider [devices|indevices|outdevices]
+```
 
 ### MIDIメッセージ送信
 ```
- mider device channel channel_voice_message_command [byte ...]
- mider device channel "ControlChange" control_change_command byte
- mider device channel "ChannelMode" channel_mode_message_command byte
- mider device system_common_message_command [byte ...]
- mider device system_realtime_message_command [byte ...]
- mider device byte "SOX" [byte ...] "EOX"
- mider device byte [byte ...]
+  mider <dev_no> <ch_no> <message_name> [byte ...]
+  mider <dev_no> <message_name> [byte ...]
+  mider <device> <ch_no> channelmode <channelmode_message_name> <byte>
+  mider <device> <ch_no> controlchange <controlchange_name> <byte>
+  mider <dev_no> sox [byte ...] eox
+  mider <dev_no> <byte> [byte ...]
 ```
 
 ### MIDI CC MSB/LSBメッセージ送信のための拡張構文
 ```
- mider device channel "ControlChange" control_change_command MSB LSB
+  mider <dev_no> <ch_no> controlchange <controlchange_name> <msb> <lsb>
 ```
 CC MSBメッセージと、CC LSBメッセージを送信する。
 
-
 ### MIDIメッセージ受信サーバ起動
 ```
- mider device "receive"
-```
-
-### MIDIデバイス一覧表示
-```
- mider "devices"
- mider "indevices"
- mider "outdevices"
+  mider <dev_no> receive
 ```
 
 ### ヘルプ表示
 ```
- mider "help"
- mider "help" command
- mider "help" "ControlChange"
- mider "help" "ControlChange" controlchange_command
- mider "help" "ChannelMode"
- mider "help" "ChannelMode" channelmode_command
+  mider help
+  mider help <message_name>
+  mider help controlchange
+  mider help controlchange <controlchange_name>
+  mider help channelmode
+  mider help channelmode <channelmode_message_name>
+  mider help [receive|devices|indevices|outdevices|version]
 ```
 
 ### バージョン表示
 ```
- mider --version
- mider version
+  mider version
 ```
 
 ## コマンド例
@@ -94,6 +90,11 @@ CC MSBメッセージと、CC LSBメッセージを送信する。
  mider help cm
  mider help cm allnotesoff
 ```
+
+## ビルド方法
+1. mider.jucerをJUCEのProjucerで開く
+2. IDE(Visual Studio / Xcode)用のプロジェクトファイルを生成する
+3. 生成されたプロジェクトファイルをIDEで開き、プロジェクトをビルドする
 
 ## 公式サイト
 http://github.com/aike/mider

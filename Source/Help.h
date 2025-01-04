@@ -250,7 +250,7 @@ private:
         {"devices",    "List MIDI devices"},
         {"indevices",  "List MIDI input devices"},
         {"outdevices", "List MIDI output devices"},
-        {"receive",    "Launch MIDI receive server"},
+        {"receive",    "Launch MIDI receive server\n  usage: mider <dev_no> receive"},
         {"version",    "Show mider version"},
     };
 };
