@@ -91,6 +91,9 @@ Send a CC MSB message and a CC LSB message.
  mider help cm allnotesoff
 ```
 
+## DOWNLOAD
+https://github.com/aike/mider/releases
+
 ## BUILD
 1. Open the mider.jucer file in JUCE Projucer application.
 2. Generate the project files for your IDE (Visual Studio / Xcode).

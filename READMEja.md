@@ -90,6 +90,8 @@ CC MSBメッセージと、CC LSBメッセージを送信する。
  mider help cm
  mider help cm allnotesoff
 ```
+## ダウンロード
+https://github.com/aike/mider/releases
 
 ## ビルド方法
 1. mider.jucerをJUCEのProjucerで開く
