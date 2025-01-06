@@ -3,7 +3,7 @@
 //   Author: aike
 //   License: MIT
 
-constexpr auto VERSION = "1.0.0";
+constexpr auto VERSION = "1.0.1";
 
 #include <JuceHeader.h>
 #include <regex>
@@ -241,8 +241,8 @@ void usage(void)
     std::cout << "  Send MIDI Message:" << std::endl;
     std::cout << "    mider <dev_no> <ch_no> <message_name> [byte ...]" << std::endl;
     std::cout << "    mider <dev_no> <message_name> [byte ...]" << std::endl;
-    std::cout << "    mider <device> <ch_no> channelmode <channelmode_message_name> <byte>" << std::endl;
-    std::cout << "    mider <device> <ch_no> controlchange <controlchange_name> <byte>" << std::endl;
+    std::cout << "    mider <dev_no> <ch_no> channelmode <channelmode_message_name> <byte>" << std::endl;
+    std::cout << "    mider <dev_no> <ch_no> controlchange <controlchange_name> <byte>" << std::endl;
     std::cout << "    mider <dev_no> <ch_no> controlchange <controlchange_name> <msb> <lsb>" << std::endl;
     std::cout << "    mider <dev_no> sox [byte ...] eox" << std::endl;
     std::cout << "    mider <dev_no> <byte> [byte ...]" << std::endl;

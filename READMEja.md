@@ -30,8 +30,8 @@ https://github.com/aike/mider/releases
 ```
   mider <dev_no> <ch_no> <message_name> [byte ...]
   mider <dev_no> <message_name> [byte ...]
-  mider <device> <ch_no> channelmode <channelmode_message_name> <byte>
-  mider <device> <ch_no> controlchange <controlchange_name> <byte>
+  mider <dev_no> <ch_no> channelmode <channelmode_message_name> <byte>
+  mider <dev_no> <ch_no> controlchange <controlchange_name> <byte>
   mider <dev_no> sox [byte ...] eox
   mider <dev_no> <byte> [byte ...]
 ```
