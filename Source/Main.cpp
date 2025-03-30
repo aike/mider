@@ -3,7 +3,7 @@
 //   Author: aike
 //   License: MIT
 
-constexpr auto VERSION = "1.0.1";
+constexpr auto VERSION = "1.0.2";
 
 #include <JuceHeader.h>
 #include <regex>

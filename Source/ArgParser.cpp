@@ -96,7 +96,7 @@ P ArgParser::parse(std::vector<std::string>arg)
                     return P::DEV_CH_CM_CHANNELMODEMSG;
                 }
             }
-            else if ((h.ccxCommandNumber(toLower(arg[3])) >= 0) && (getNumber(arg[4]) > 0) && (getNumber(arg[5]) > 0))
+            else if ((h.ccxCommandNumber(toLower(arg[3])) >= 0) && (getNumber(arg[4]) >= 0) && (getNumber(arg[5]) >= 0))
             {
                 byte1 = h.ccxCommandNumber(toLower(arg[3]));
                 int byte2 = getNumber(arg[4]);
@@ -233,7 +233,7 @@ P ArgParser::parse(std::vector<std::string>arg)
         }
         if (byte1 < 0)
         {
-            if ((h.ccxCommandNumber(toLower(arg[4])) >= 0) && (getNumber(arg[5]) > 0) && (getNumber(arg[6]) > 0))
+            if ((h.ccxCommandNumber(toLower(arg[4])) >= 0) && (getNumber(arg[5]) >= 0) && (getNumber(arg[6]) >= 0))
             {
                 byte1 = h.ccxCommandNumber(toLower(arg[4]));
                 byte2 = getNumber(arg[5]);
